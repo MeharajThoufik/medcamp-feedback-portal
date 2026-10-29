@@ -1,0 +1,186 @@
+{
+  "app": {
+    "name": "Medical Camp Feedback Portal",
+    "shortName": "MedCamp Feedback"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "create": "Create",
+    "close": "Close",
+    "all": "All",
+    "active": "Active",
+    "inactive": "Inactive",
+    "never": "Never",
+    "actions": "Actions",
+    "retry": "Try again",
+    "goHome": "Go to home",
+    "somethingWrong": "Something went wrong. Please try again.",
+    "serverUnreachable": "Cannot reach the server. Check that the app is running and you are on the right network."
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Enter a valid email address",
+    "tooLong": "This is too long",
+    "departmentRequired": "Medical staff must be linked to a department",
+    "passwordLength": "Use at least 8 characters",
+    "passwordMix": "Use at least one letter and one number",
+    "passwordMismatch": "Passwords do not match"
+  },
+  "roles": {
+    "SUPER_ADMIN": "Super Admin",
+    "ORGANIZER": "Organizer",
+    "MEDICAL_STAFF": "Medical Staff",
+    "ANALYST": "Analyst"
+  },
+  "nav": {
+    "home": "Home",
+    "administration": "Administration",
+    "users": "Users",
+    "departments": "Departments",
+    "changePassword": "Change password",
+    "signOut": "Sign out",
+    "notifications": "Notifications",
+    "noNotifications": "No notifications yet",
+    "language": "Language",
+    "colorScheme": "Switch light or dark mode",
+    "toggleMenu": "Open or close the menu"
+  },
+  "login": {
+    "title": "Staff sign in",
+    "subtitle": "Attendees do not need an account. They give feedback by scanning the camp QR code.",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "errors": {
+      "INVALID_CREDENTIALS": "Incorrect email or password.",
+      "ACCOUNT_LOCKED": "Too many failed attempts. Please wait 15 minutes and try again.",
+      "ACCOUNT_DISABLED": "This account has been disabled. Contact your administrator."
+    }
+  },
+  "password": {
+    "title": "Change password",
+    "forcedTitle": "Set a new password",
+    "forcedInfo": "You signed in with a temporary password. Choose your own password to continue.",
+    "current": "Current password",
+    "new": "New password",
+    "confirm": "Confirm new password",
+    "rules": "At least 8 characters, with at least one letter and one number.",
+    "submit": "Change password",
+    "success": "Your password has been changed.",
+    "errors": {
+      "WRONG_CURRENT_PASSWORD": "The current password is incorrect.",
+      "PASSWORD_UNCHANGED": "The new password must be different from the current one.",
+      "PASSWORD_TOO_LONG": "The new password is too long."
+    }
+  },
+  "home": {
+    "greeting": "Welcome, {{name}}",
+    "roleInfo": {
+      "SUPER_ADMIN": "You manage user accounts and departments, and you can see every camp.",
+      "ORGANIZER": "You will create camps, share their QR codes and handle complaints for your camps.",
+      "MEDICAL_STAFF": "You will see feedback and complaints for your department.",
+      "ANALYST": "You will see combined, anonymous results across camps."
+    },
+    "department": "Department: {{name}}",
+    "nextTitle": "Coming next",
+    "next": "Camps, QR codes, the feedback form, complaints and dashboards will appear here as each phase is finished.",
+    "manageUsers": "Manage users",
+    "manageDepartments": "Manage departments"
+  },
+  "users": {
+    "title": "Users",
+    "subtitle": "Staff accounts and what each person is allowed to do.",
+    "add": "Add user",
+    "searchPlaceholder": "Search by name or email",
+    "role": "Role",
+    "allRoles": "All roles",
+    "status": "Status",
+    "statusActive": "Active",
+    "statusDisabled": "Disabled",
+    "columns": {
+      "name": "Name",
+      "role": "Role",
+      "department": "Department",
+      "status": "Status",
+      "lastLogin": "Last sign-in"
+    },
+    "badges": {
+      "locked": "Locked",
+      "mustChange": "Temporary password",
+      "you": "You"
+    },
+    "empty": "No users match these filters.",
+    "count": "{{count}} users",
+    "form": {
+      "createTitle": "Add user",
+      "editTitle": "Edit user",
+      "email": "Email",
+      "fullName": "Full name",
+      "role": "Role",
+      "department": "Department",
+      "departmentPlaceholder": "Choose a department",
+      "departmentHint": "Medical staff only see feedback for their department.",
+      "noDepartments": "No active departments. Add one on the Departments page first.",
+      "createHint": "A temporary password will be created and shown once."
+    },
+    "menu": {
+      "edit": "Edit",
+      "resetPassword": "Reset password",
+      "disable": "Disable",
+      "enable": "Enable"
+    },
+    "confirmDisable": {
+      "title": "Disable {{name}}?",
+      "body": "They are signed out straight away and cannot sign in until you enable the account again.",
+      "confirm": "Disable"
+    },
+    "confirmReset": {
+      "title": "Reset the password for {{name}}?",
+      "body": "A new temporary password is created. The old password stops working and the account is unlocked.",
+      "confirm": "Reset password"
+    },
+    "tempPassword": {
+      "title": "Temporary password",
+      "body": "Give this password to {{name}}. It is shown only once. They must change it when they first sign in.",
+      "copy": "Copy",
+      "copied": "Copied",
+      "done": "I have saved it"
+    },
+    "created": "User created",
+    "updated": "User updated",
+    "enabled": "User enabled",
+    "disabled": "User disabled",
+    "errors": {
+      "EMAIL_TAKEN": "A user with this email already exists.",
+      "DEPARTMENT_REQUIRED": "Medical staff must be linked to a department.",
+      "DEPARTMENT_INACTIVE": "This department is inactive. Choose another one.",
+      "CANNOT_DISABLE_SELF": "You cannot disable your own account.",
+      "CANNOT_CHANGE_OWN_ROLE": "You cannot change your own role."
+    }
+  },
+  "departments": {
+    "title": "Departments",
+    "subtitle": "Services offered at camps. Medical staff are linked to one department.",
+    "add": "Add",
+    "name": "Department name",
+    "namePlaceholder": "For example: Eye Care",
+    "showInactive": "Show inactive",
+    "empty": "No departments yet. Add the services your camps offer, such as Eye Care or Dental.",
+    "rename": "Rename",
+    "renameTitle": "Rename department",
+    "created": "Department added",
+    "updated": "Department updated",
+    "errors": {
+      "DEPARTMENT_NAME_TAKEN": "A department with this name already exists."
+    }
+  },
+  "errors": {
+    "forbiddenTitle": "No access",
+    "forbiddenBody": "Your role does not give you access to this page.",
+    "notFoundTitle": "Page not found",
+    "notFoundBody": "This page does not exist. It may have moved, or the link may be wrong.",
+    "CONCURRENT_UPDATE": "Someone else changed this at the same time. Reload and try again.",
+    "NETWORK_ERROR": "Cannot reach the server. Check your connection."
+  }
+}

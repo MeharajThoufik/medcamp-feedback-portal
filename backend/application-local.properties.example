@@ -1,0 +1,15 @@
+# Copy this file to "application-local.properties" in the folder you start the app from.
+# That file is git-ignored, so passwords placed in it never reach GitHub.
+
+# Address printed inside QR codes. Windows Mobile Hotspot gives the laptop 192.168.137.1.
+#app.public-base-url=http://192.168.137.1:8080
+
+# Use PostgreSQL instead of the built-in H2 development database.
+#spring.profiles.active=prod
+#spring.datasource.url=jdbc:postgresql://localhost:5432/medcamp
+#spring.datasource.username=medcamp
+#spring.datasource.password=change-me
+
+# Password for the first Super Admin (used only when the database has no users yet).
+#app.bootstrap.admin.email=admin@medcamp.local
+#app.bootstrap.admin.password=change-me-123
