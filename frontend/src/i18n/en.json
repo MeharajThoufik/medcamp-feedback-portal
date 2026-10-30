@@ -424,7 +424,8 @@
     "how1": "Open your phone camera and point it at the code.",
     "how2": "Tap the link that appears on the screen.",
     "how3": "No app or account needed. It takes about 2 minutes.",
-    "help": "Need help? Ask any volunteer at the help desk."
+    "help": "Need help? Ask any volunteer at the help desk.",
+    "track": "Reported a problem? Check it at"
   },
   "public": {
     "welcome": "Feedback for",
@@ -472,7 +473,12 @@
     },
     "problem": {
       "label": "I want to report a problem",
-      "hint": "Staff will look into it. Describe what happened in the box above."
+      "hint": "Staff will look into it. You will get a reference number to check on it.",
+      "categoryLabel": "What was the problem about?",
+      "categoryRequired": "Please choose what the problem was about",
+      "descriptionLabel": "What happened?",
+      "descriptionHint": "Where and when, so staff can fix it. Please do not include medical details.",
+      "descriptionShort": "Please describe the problem in a few more words"
     },
     "followUp": {
       "title": "Should we contact you about your feedback?",
@@ -491,7 +497,7 @@
     "done": {
       "title": "Thank you!",
       "body": "Your feedback has been received. It helps us make the camp better for everyone.",
-      "problemNote": "Staff will look into the problem you reported.",
+      "problemNote": "Your problem has been passed on to the camp staff.",
       "another": "Give feedback for another person"
     },
     "already": {
@@ -508,6 +514,54 @@
       "FORM_CLOSED": "This camp has stopped taking feedback.",
       "network": "Could not send. Check that you are connected to the camp Wi-Fi and try again. Your answers are saved on this phone.",
       "other": "Something went wrong while sending. Please try again."
+    },
+    "reference": {
+      "title": "Your reference number",
+      "copy": "Copy",
+      "copied": "Copied",
+      "screenshot": "Take a screenshot or write it down. You need it to check on your problem later.",
+      "check": "Check the status now"
+    }
+  },
+  "track": {
+    "title": "Check my complaint",
+    "subtitle": "Enter the reference number you got after reporting a problem.",
+    "label": "Reference number",
+    "check": "Check",
+    "timeline": "Complaint progress",
+    "updated": "Last updated {{when}}",
+    "received": "Received {{when}}",
+    "status": {
+      "OPEN": {
+        "title": "Received",
+        "body": ""
+      },
+      "IN_PROGRESS": {
+        "title": "Being looked into",
+        "body": "Camp staff are working on it."
+      },
+      "RESOLVED": {
+        "title": "Resolved",
+        "body": "Staff have dealt with the problem."
+      },
+      "CLOSED": {
+        "title": "Closed",
+        "body": "This complaint is finished."
+      }
+    },
+    "noteTitle": "Message from the camp team",
+    "notFoundTitle": "No complaint found",
+    "notFoundBody": "Check the reference number and try again. It looks like MC-26-K7Q2XP.",
+    "tooMany": "Too many checks from this phone. Please wait a few minutes and try again.",
+    "offline": "Cannot reach the camp. Check that you are connected to the camp Wi-Fi and try again.",
+    "privacy": "This page shows only the progress of a complaint. It never shows names or contact details."
+  },
+  "complaints": {
+    "status": {
+      "OPEN": "Open",
+      "IN_PROGRESS": "In progress",
+      "RESOLVED": "Resolved",
+      "CLOSED": "Closed"
     }
   },
   "errors": {

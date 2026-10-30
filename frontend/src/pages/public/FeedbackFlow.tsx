@@ -3,6 +3,7 @@ import {
   Button,
   Checkbox,
   Group,
+  Paper,
   Progress,
   Radio,
   SegmentedControl,
@@ -34,6 +35,7 @@ import {
   type Step,
   type StepErrors,
 } from './feedbackDraft'
+import { ReferenceCard } from './ReferenceCard'
 
 type Screen = 'form' | 'already' | 'done'
 
@@ -58,6 +60,8 @@ export function FeedbackFlow({
   const [answers, setAnswers] = useState<Answers>(initial?.answers ?? EMPTY_ANSWERS)
   const [errors, setErrors] = useState<StepErrors>({})
   const [restored] = useState(initial !== null && initial.step !== 'language')
+  /** The complaint reference to show on the thank-you screen. */
+  const [reference, setReference] = useState<string | null>(null)
   const submit = useSubmitFeedback(token)
   const headingRef = useRef<HTMLHeadingElement>(null)
 
@@ -106,9 +110,10 @@ export function FeedbackFlow({
     goTo(index <= 0 ? 'language' : STEPS[index - 1])
   }
 
-  const finish = () => {
+  const finish = (complaintReference: string | null) => {
     clearDraft(token)
     if (!assisted) markSentFromThisPhone(token)
+    setReference(complaintReference)
     setScreen('done')
   }
 
@@ -119,7 +124,13 @@ export function FeedbackFlow({
         serviceId: typeof answers.serviceId === 'number' ? answers.serviceId : null,
         ratings: answers.ratings,
         comment: answers.comment.trim() || null,
-        problemReported: answers.problemReported,
+        complaint:
+          answers.problemReported && answers.problemCategory
+            ? {
+                categoryCode: answers.problemCategory,
+                description: answers.problemDescription.trim(),
+              }
+            : null,
         followUp: answers.wantsFollowUp
           ? {
               consent: answers.consent,
@@ -131,9 +142,9 @@ export function FeedbackFlow({
         assisted,
       },
       {
-        onSuccess: finish,
+        onSuccess: (result) => finish(result.complaintReference),
         onError: (error) => {
-          if (error instanceof ApiError && error.code === 'ALREADY_SUBMITTED') finish()
+          if (error instanceof ApiError && error.code === 'ALREADY_SUBMITTED') finish(null)
         },
       },
     )
@@ -143,6 +154,7 @@ export function FeedbackFlow({
     setAnswers(EMPTY_ANSWERS)
     setStep(assisted ? 'service' : 'language')
     setScreen('form')
+    setReference(null)
     submit.reset()
   }
 
@@ -171,10 +183,11 @@ export function FeedbackFlow({
         </ThemeIcon>
         {heading(t('feedbackForm.done.title'))}
         <Text>{t('feedbackForm.done.body')}</Text>
-        {answers.problemReported && (
-          <Text size="sm" c="dimmed">
-            {t('feedbackForm.done.problemNote')}
-          </Text>
+        {reference && (
+          <>
+            <Text size="sm">{t('feedbackForm.done.problemNote')}</Text>
+            <ReferenceCard reference={reference} />
+          </>
         )}
         <Button size="lg" variant={assisted ? 'filled' : 'light'} onClick={startOver} mt="sm">
           {assisted ? t('feedbackForm.assisted.next') : t('feedbackForm.done.another')}
@@ -287,6 +300,15 @@ export function FeedbackFlow({
               checked={answers.problemReported}
               onChange={(event) => update({ problemReported: event.currentTarget.checked })}
             />
+            {answers.problemReported && (
+              <ProblemSection
+                form={form}
+                language={language}
+                answers={answers}
+                errors={errors}
+                update={update}
+              />
+            )}
           </Stack>
         )}
         {step === 'followUp' && (
@@ -374,6 +396,53 @@ function ServiceStep({ form, answers, errors, update, heading }: StepProps & { f
         </Radio.Card>
       </Stack>
     </Radio.Group>
+  )
+}
+
+/** What the problem was about and what happened; it becomes a complaint with a reference. */
+function ProblemSection({
+  form,
+  language,
+  answers,
+  errors,
+  update,
+}: Omit<StepProps, 'heading'> & { form: PublicForm; language: FormLanguage }) {
+  const { t } = useTranslation()
+  return (
+    <Paper withBorder radius="md" p="md">
+      <Stack gap="md">
+        <Radio.Group
+          label={t('feedbackForm.problem.categoryLabel')}
+          withAsterisk
+          value={answers.problemCategory}
+          onChange={(code) => update({ problemCategory: code })}
+          error={errors.problemCategory && t(errors.problemCategory)}
+        >
+          <Stack gap="xs" mt="xs">
+            {form.complaintCategories.map((category) => (
+              <Radio
+                key={category.code}
+                size="md"
+                value={category.code}
+                label={language === 'hi' ? category.labelHi : category.labelEn}
+              />
+            ))}
+          </Stack>
+        </Radio.Group>
+        <Textarea
+          label={t('feedbackForm.problem.descriptionLabel')}
+          description={t('feedbackForm.problem.descriptionHint')}
+          withAsterisk
+          autosize
+          minRows={3}
+          maxLength={1000}
+          size="md"
+          value={answers.problemDescription}
+          onChange={(event) => update({ problemDescription: event.currentTarget.value })}
+          error={errors.problemDescription && t(errors.problemDescription)}
+        />
+      </Stack>
+    </Paper>
   )
 }
 

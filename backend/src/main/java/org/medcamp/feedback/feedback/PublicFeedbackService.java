@@ -15,6 +15,9 @@ import org.medcamp.feedback.camp.CampService;
 import org.medcamp.feedback.camp.FeedbackState;
 import org.medcamp.feedback.common.ApiException;
 import org.medcamp.feedback.common.RateLimiter;
+import org.medcamp.feedback.complaint.ComplaintCategory;
+import org.medcamp.feedback.complaint.ComplaintDtos.ComplaintRequest;
+import org.medcamp.feedback.complaint.ComplaintFiling;
 import org.medcamp.feedback.feedback.FeedbackDtos.CategoryResponse;
 import org.medcamp.feedback.feedback.FeedbackDtos.FeedbackRequest;
 import org.medcamp.feedback.feedback.FeedbackDtos.FollowUpRequest;
@@ -44,11 +47,12 @@ public class PublicFeedbackService {
 	private final UserRepository users;
 	private final FormTokens formTokens;
 	private final RateLimiter rateLimiter;
+	private final ComplaintFiling complaintFiling;
 	private final Clock clock;
 
 	public PublicFeedbackService(CampManager campManager, CampCalendar calendar, RatingCategoryRepository categories,
 			FeedbackRepository feedback, UserRepository users, FormTokens formTokens, RateLimiter rateLimiter,
-			Clock clock) {
+			ComplaintFiling complaintFiling, Clock clock) {
 		this.campManager = campManager;
 		this.calendar = calendar;
 		this.categories = categories;
@@ -56,6 +60,7 @@ public class PublicFeedbackService {
 		this.users = users;
 		this.formTokens = formTokens;
 		this.rateLimiter = rateLimiter;
+		this.complaintFiling = complaintFiling;
 		this.clock = clock;
 	}
 
@@ -71,7 +76,7 @@ public class PublicFeedbackService {
 			.map(CategoryResponse::from)
 			.toList();
 		return new PublicFormResponse(camp.getName(), camp.getLocation(), camp.getStartDate(), camp.getEndDate(),
-				camp.feedbackState(calendar.today()), services, categoryList);
+				camp.feedbackState(calendar.today()), services, categoryList, complaintFiling.activeCategories());
 	}
 
 	@Transactional(readOnly = true)
@@ -99,6 +104,9 @@ public class PublicFeedbackService {
 		if (feedback.existsBySubmissionToken(request.submissionToken())) {
 			throw ApiException.conflict("ALREADY_SUBMITTED", "This form has already been submitted.");
 		}
+		ComplaintRequest problem = request.complaint();
+		ComplaintCategory problemCategory = problem == null ? null
+				: complaintFiling.requireCategory(problem.categoryCode());
 		// Counted after the token checks, so a phone retrying a form that already arrived loses nothing.
 		// Assisted forms are not limited: one staff laptop fills in many.
 		if (!request.assisted()
@@ -110,12 +118,15 @@ public class PublicFeedbackService {
 				request.submissionToken(), clock.instant());
 		addRatings(entry, request.ratings());
 		entry.setComment(blankToNull(request.comment()));
-		entry.setProblemReported(request.problemReported());
+		entry.setProblemReported(problem != null);
 		applyFollowUp(entry, request.followUp());
 		if (request.assisted()) {
 			entry.markAssisted(users.getReferenceById(me.getId()));
 		}
-		return new SubmissionResponse(feedback.save(entry).getSubmittedAt());
+		Feedback saved = feedback.save(entry);
+		// Same transaction: if the complaint cannot be saved, the feedback is not saved either.
+		String reference = problem == null ? null : complaintFiling.file(saved, problemCategory, problem);
+		return new SubmissionResponse(saved.getSubmittedAt(), reference);
 	}
 
 	private Camp findCamp(String token) {

@@ -13,11 +13,14 @@ import org.medcamp.feedback.camp.CampManager;
 import org.medcamp.feedback.camp.CampService;
 import org.medcamp.feedback.common.ApiException;
 import org.medcamp.feedback.common.PageResponse;
+import org.medcamp.feedback.complaint.ComplaintDtos.ComplaintBrief;
+import org.medcamp.feedback.complaint.ComplaintFiling;
 import org.medcamp.feedback.feedback.FeedbackDtos.CategorySummary;
 import org.medcamp.feedback.feedback.FeedbackDtos.Contact;
 import org.medcamp.feedback.feedback.FeedbackDtos.FeedbackItem;
 import org.medcamp.feedback.feedback.FeedbackDtos.FeedbackSummary;
 import org.medcamp.feedback.user.Role;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -41,12 +44,14 @@ public class FeedbackQueryService {
 	private final CampManager campManager;
 	private final FeedbackRepository feedback;
 	private final RatingCategoryRepository categories;
+	private final ComplaintFiling complaintFiling;
 
 	public FeedbackQueryService(CampManager campManager, FeedbackRepository feedback,
-			RatingCategoryRepository categories) {
+			RatingCategoryRepository categories, ComplaintFiling complaintFiling) {
 		this.campManager = campManager;
 		this.feedback = feedback;
 		this.categories = categories;
+		this.complaintFiling = complaintFiling;
 	}
 
 	public PageResponse<FeedbackItem> list(long campId, int page, int size, AppUserDetails me) {
@@ -54,8 +59,10 @@ public class FeedbackQueryService {
 		boolean showContact = CampManager.canManage(camp, me);
 		PageRequest pageRequest = PageRequest.of(Math.max(page, 0), Math.clamp(size, 1, MAX_PAGE_SIZE),
 				Sort.by(Sort.Direction.DESC, "submittedAt").and(Sort.by(Sort.Direction.DESC, "id")));
-		return PageResponse.of(feedback.findForCamp(camp.getId(), departmentFilter(me), pageRequest)
-			.map(entry -> toItem(entry, showContact)));
+		Page<Feedback> entries = feedback.findForCamp(camp.getId(), departmentFilter(me), pageRequest);
+		Map<Long, ComplaintBrief> complaints = complaintFiling
+			.briefsForFeedback(entries.getContent().stream().map(Feedback::getId).toList());
+		return PageResponse.of(entries.map(entry -> toItem(entry, complaints.get(entry.getId()), showContact)));
 	}
 
 	public FeedbackSummary summary(long campId, AppUserDetails me) {
@@ -89,7 +96,7 @@ public class FeedbackQueryService {
 		return me.getRole() == Role.MEDICAL_STAFF ? me.getDepartmentId() : null;
 	}
 
-	private static FeedbackItem toItem(Feedback entry, boolean showContact) {
+	private static FeedbackItem toItem(Feedback entry, ComplaintBrief complaint, boolean showContact) {
 		Map<String, Integer> ratings = new LinkedHashMap<>();
 		entry.getRatings()
 			.stream()
@@ -101,7 +108,8 @@ public class FeedbackQueryService {
 		return new FeedbackItem(entry.getId(), entry.getSubmittedAt(), service == null ? null : service.getId(),
 				service == null ? null : service.getName(),
 				service == null ? null : service.getDepartment().getName(), ratings, entry.getComment(),
-				entry.isProblemReported(), entry.getLanguage(), !entry.isFollowUpConsent(), entry.isAssisted(),
+				entry.isProblemReported(), complaint, entry.getLanguage(), !entry.isFollowUpConsent(),
+				entry.isAssisted(),
 				entry.getAssistedBy() == null ? null : entry.getAssistedBy().getFullName(), contact);
 	}
 

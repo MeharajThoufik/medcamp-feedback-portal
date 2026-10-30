@@ -203,8 +203,38 @@ function FeedbackCard({ item, labels }: { item: FeedbackItem; labels: Labels }) 
 
         {item.comment && <Text style={{ whiteSpace: 'pre-wrap' }}>{item.comment}</Text>}
 
+        {item.complaint && (
+          <Paper
+            withBorder
+            radius="sm"
+            p="sm"
+            style={{ borderColor: 'var(--mantine-color-red-4)' }}
+          >
+            <Stack gap={4}>
+              <Group justify="space-between" gap="xs">
+                <Text size="sm" fw={600} c="red">
+                  {i18n.language === 'hi'
+                    ? item.complaint.categoryLabelHi
+                    : item.complaint.categoryLabelEn}
+                </Text>
+                <Group gap={6}>
+                  <Text size="xs" ff="monospace">
+                    {item.complaint.referenceNo}
+                  </Text>
+                  <Badge size="sm" variant="light" color="red">
+                    {t(`complaints.status.${item.complaint.status}`)}
+                  </Badge>
+                </Group>
+              </Group>
+              <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>
+                {item.complaint.description}
+              </Text>
+            </Stack>
+          </Paper>
+        )}
+
         <Group gap={6}>
-          {item.problemReported && (
+          {item.problemReported && !item.complaint && (
             <Badge color="red" variant="filled">
               {t('camps.feedback.problem')}
             </Badge>

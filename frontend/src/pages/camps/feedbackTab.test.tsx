@@ -34,6 +34,15 @@ const ITEM: FeedbackItem = {
   ratings: { WAITING_TIME: 2, OVERALL: 4 },
   comment: 'Long queue',
   problemReported: true,
+  complaint: {
+    referenceNo: 'MC-26-K7Q2XP',
+    status: 'OPEN',
+    priority: 'MEDIUM',
+    categoryCode: 'WAITING',
+    categoryLabelEn: 'Long wait or crowding',
+    categoryLabelHi: 'लंबा इंतज़ार या भीड़',
+    description: 'Waited two hours at registration',
+  },
   language: 'hi',
   anonymous: false,
   assisted: false,
@@ -57,7 +66,9 @@ describe('CampFeedbackTab', () => {
     expect(await screen.findByText('1 response')).toBeInTheDocument()
     expect(screen.getByText('Long queue')).toBeInTheDocument()
     expect(screen.getByText('Waiting time: 2/5')).toBeInTheDocument()
-    expect(screen.getByText('Problem reported')).toBeInTheDocument()
+    expect(screen.getByText('Long wait or crowding')).toBeInTheDocument()
+    expect(screen.getByText('MC-26-K7Q2XP')).toBeInTheDocument()
+    expect(screen.getByText('Waited two hours at registration')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: '+919876543210' })).toHaveAttribute(
       'href',
       'tel:+919876543210',

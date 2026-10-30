@@ -11,6 +11,7 @@ import { NotFoundPage } from './pages/ErrorPages'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
 import { PublicCampPage } from './pages/public/PublicCampPage'
+import { TrackComplaintPage } from './pages/public/TrackComplaintPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { UsersPage } from './pages/users/UsersPage'
 
@@ -18,6 +19,8 @@ export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
   // Opened from a camp's QR code by attendees, who never sign in.
   { path: '/f/:token', element: <PublicCampPage /> },
+  // Attendees check a reported problem with its reference number.
+  { path: '/track', element: <TrackComplaintPage /> },
   {
     // Outside the app layout, so only the poster prints.
     path: '/camps/:id/poster',

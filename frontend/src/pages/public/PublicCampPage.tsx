@@ -1,14 +1,4 @@
-import {
-  Alert,
-  Button,
-  Container,
-  Group,
-  Skeleton,
-  Stack,
-  Text,
-  ThemeIcon,
-  Title,
-} from '@mantine/core'
+import { Alert, Button, Group, Skeleton, Stack, Text, ThemeIcon, Title } from '@mantine/core'
 import {
   IconCalendarEvent,
   IconClockHour4,
@@ -23,10 +13,9 @@ import { useMe } from '../../api/auth'
 import { ApiError } from '../../api/client'
 import { usePublicForm } from '../../api/publicCamps'
 import type { FeedbackState } from '../../api/types'
-import { AppLogo } from '../../components/AppLogo'
-import { LanguageSwitch } from '../../components/HeaderControls'
 import { useCampDateFormat } from '../camps/campDates'
 import { FeedbackFlow } from './FeedbackFlow'
+import { PublicLayout } from './PublicLayout'
 
 /**
  * The page a camp's QR code opens. Attendees never sign in. With `?assisted=1`, signed-in staff
@@ -35,20 +24,9 @@ import { FeedbackFlow } from './FeedbackFlow'
 export function PublicCampPage() {
   const { token = '' } = useParams()
   return (
-    <Stack mih="100vh" gap={0} bg="var(--mantine-color-body)">
-      <Group
-        justify="space-between"
-        px="md"
-        py="sm"
-        style={{ borderBottom: '1px solid var(--mantine-color-default-border)' }}
-      >
-        <AppLogo />
-        <LanguageSwitch />
-      </Group>
-      <Container size={560} w="100%" px="md" py="lg">
-        <PublicCampContent token={token} />
-      </Container>
-    </Stack>
+    <PublicLayout>
+      <PublicCampContent token={token} />
+    </PublicLayout>
   )
 }
 
