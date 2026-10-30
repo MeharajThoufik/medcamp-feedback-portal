@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import jakarta.persistence.criteria.Predicate;
@@ -19,6 +20,9 @@ import org.medcamp.feedback.camp.CampDtos.CampFilter;
 import org.medcamp.feedback.camp.CampDtos.CampRequest;
 import org.medcamp.feedback.camp.CampDtos.CampResponse;
 import org.medcamp.feedback.camp.CampDtos.CampSummary;
+import org.medcamp.feedback.camp.CampDtos.PosterResponse;
+import org.medcamp.feedback.camp.CampDtos.PosterWifi;
+import org.medcamp.feedback.camp.CampDtos.PublicCampResponse;
 import org.medcamp.feedback.camp.CampDtos.ServiceRequest;
 import org.medcamp.feedback.camp.CampDtos.ServiceResponse;
 import org.medcamp.feedback.common.ApiException;
@@ -26,6 +30,9 @@ import org.medcamp.feedback.common.PageResponse;
 import org.medcamp.feedback.config.AppProperties;
 import org.medcamp.feedback.department.Department;
 import org.medcamp.feedback.department.DepartmentService;
+import org.medcamp.feedback.qr.FeedbackLinks;
+import org.medcamp.feedback.qr.QrCodeWriter;
+import org.medcamp.feedback.settings.SettingsService;
 import org.medcamp.feedback.user.Role;
 import org.medcamp.feedback.user.User;
 import org.medcamp.feedback.user.UserRepository;
@@ -54,15 +61,22 @@ public class CampManager {
 	private final UserRepository users;
 	private final DepartmentService departmentService;
 	private final PublicTokenGenerator tokenGenerator;
+	private final FeedbackLinks feedbackLinks;
+	private final QrCodeWriter qrCodeWriter;
+	private final SettingsService settingsService;
 	private final Clock clock;
 	private final AppProperties properties;
 
 	public CampManager(CampRepository camps, UserRepository users, DepartmentService departmentService,
-			PublicTokenGenerator tokenGenerator, Clock clock, AppProperties properties) {
+			PublicTokenGenerator tokenGenerator, FeedbackLinks feedbackLinks, QrCodeWriter qrCodeWriter,
+			SettingsService settingsService, Clock clock, AppProperties properties) {
 		this.camps = camps;
 		this.users = users;
 		this.departmentService = departmentService;
 		this.tokenGenerator = tokenGenerator;
+		this.feedbackLinks = feedbackLinks;
+		this.qrCodeWriter = qrCodeWriter;
+		this.settingsService = settingsService;
 		this.clock = clock;
 		this.properties = properties;
 	}
@@ -78,11 +92,48 @@ public class CampManager {
 
 	@Transactional(readOnly = true)
 	public CampResponse get(long id, AppUserDetails me) {
-		Camp camp = getEntity(id);
-		if (!canView(camp, me)) {
-			throw ApiException.forbidden("CAMP_ACCESS_DENIED", "You do not have access to this camp.");
+		return toResponse(getEntityForView(id, me), me);
+	}
+
+	/** The camp's QR code as a PNG. Anyone who can see the camp can see its link. */
+	@Transactional(readOnly = true)
+	public byte[] qrCode(long id, int size, AppUserDetails me) {
+		Camp camp = getEntityForView(id, me);
+		return qrCodeWriter.png(feedbackLinks.forToken(camp.getPublicToken()), size);
+	}
+
+	/** Poster details, including the camp Wi-Fi password, so only the camp's managers get them. */
+	@Transactional(readOnly = true)
+	public PosterResponse poster(long id, AppUserDetails me) {
+		Camp camp = getEntityForChange(id, me);
+		PosterWifi wifi = settingsService.wifi().map(w -> new PosterWifi(w.ssid(), w.password())).orElse(null);
+		return new PosterResponse(camp.getId(), camp.getName(), camp.getLocation(), camp.getStartDate(),
+				camp.getEndDate(), feedbackLinks.forToken(camp.getPublicToken()), wifi);
+	}
+
+	/** Gives the camp a new link; printed QR codes and shared links for the old one stop working. */
+	public CampResponse regeneratePublicToken(long id, AppUserDetails me) {
+		Camp camp = getEntityForChange(id, me);
+		if (camp.getStatus() == CampStatus.ARCHIVED) {
+			throw ApiException.conflict("CAMP_ARCHIVED", "Archived camps cannot be edited. Restore the camp first.");
 		}
+		camp.changePublicToken(newPublicToken());
 		return toResponse(camp, me);
+	}
+
+	/**
+	 * Looks up a camp by the token in its public link. Archived camps and malformed tokens look
+	 * the same as unknown ones.
+	 */
+	@Transactional(readOnly = true)
+	public PublicCampResponse findPublic(String token) {
+		return Optional.ofNullable(token)
+			.filter(t -> t.matches("[A-Za-z0-9]{4,16}"))
+			.flatMap(camps::findByPublicToken)
+			.filter(camp -> camp.getStatus() != CampStatus.ARCHIVED)
+			.map(camp -> new PublicCampResponse(camp.getName(), camp.getLocation(), camp.getStartDate(),
+					camp.getEndDate(), camp.feedbackState(today())))
+			.orElseThrow(() -> ApiException.notFound("CAMP_LINK_INVALID", "This feedback link is not valid."));
 	}
 
 	public CampResponse create(CampRequest request, AppUserDetails me) {
@@ -211,6 +262,14 @@ public class CampManager {
 			.orElseThrow(() -> ApiException.notFound("CAMP_NOT_FOUND", "Camp not found."));
 	}
 
+	private Camp getEntityForView(long id, AppUserDetails me) {
+		Camp camp = getEntity(id);
+		if (!canView(camp, me)) {
+			throw ApiException.forbidden("CAMP_ACCESS_DENIED", "You do not have access to this camp.");
+		}
+		return camp;
+	}
+
 	private Camp getEntityForChange(long id, AppUserDetails me) {
 		requireOrganizerOrAdmin(me);
 		Camp camp = getEntity(id);
@@ -302,8 +361,8 @@ public class CampManager {
 				? Arrays.stream(CampStatus.values()).filter(camp.getStatus()::canMoveTo).toList() : List.of();
 		return new CampResponse(camp.getId(), camp.getName(), camp.getLocation(), camp.getStartDate(),
 				camp.getEndDate(), camp.getStatus(), camp.feedbackState(today()), camp.getFeedbackOpensOn(),
-				camp.getFeedbackClosesOn(), camp.getPublicToken(), camp.getOrganizer().getId(),
-				camp.getOrganizer().getFullName(), camp.getServices().stream().map(ServiceResponse::from).toList(),
+				camp.getFeedbackClosesOn(), camp.getPublicToken(), feedbackLinks.forToken(camp.getPublicToken()),
+				camp.getOrganizer().getId(), camp.getOrganizer().getFullName(), camp.getServices().stream().map(ServiceResponse::from).toList(),
 				canEdit, nextStatuses, camp.getCreatedAt(), camp.getUpdatedAt());
 	}
 

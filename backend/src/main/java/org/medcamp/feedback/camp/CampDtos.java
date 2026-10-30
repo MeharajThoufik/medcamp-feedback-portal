@@ -59,13 +59,32 @@ public final class CampDtos {
 	}
 
 	/**
-	 * Full camp details. {@code canEdit} and {@code nextStatuses} tell the screen which actions to
-	 * offer; the server checks the same rules again on every change.
+	 * Full camp details. {@code feedbackUrl} is the link inside the camp's QR code.
+	 * {@code canEdit} and {@code nextStatuses} tell the screen which actions to offer; the server
+	 * checks the same rules again on every change.
 	 */
 	public record CampResponse(Long id, String name, String location, LocalDate startDate, LocalDate endDate,
 			CampStatus status, FeedbackState feedbackState, LocalDate feedbackOpensOn, LocalDate feedbackClosesOn,
-			String publicToken, Long organizerId, String organizerName, List<ServiceResponse> services,
-			boolean canEdit, List<CampStatus> nextStatuses, Instant createdAt, Instant updatedAt) {
+			String publicToken, String feedbackUrl, Long organizerId, String organizerName,
+			List<ServiceResponse> services, boolean canEdit, List<CampStatus> nextStatuses, Instant createdAt,
+			Instant updatedAt) {
+	}
+
+	/** What the printable poster shows. {@code wifi} is null when no camp Wi-Fi is set. */
+	public record PosterResponse(Long campId, String name, String location, LocalDate startDate, LocalDate endDate,
+			String feedbackUrl, PosterWifi wifi) {
+	}
+
+	/** {@code password} is null for an open network. */
+	public record PosterWifi(String ssid, String password) {
+	}
+
+	/**
+	 * What anyone with the camp's link may see: no organizer, no internal ids. Phase 4 adds the
+	 * services attendees choose from.
+	 */
+	public record PublicCampResponse(String name, String location, LocalDate startDate, LocalDate endDate,
+			FeedbackState feedbackState) {
 	}
 
 }

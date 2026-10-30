@@ -36,6 +36,7 @@ import type { Camp, CampServiceItem } from '../../api/types'
 import { errorMessage } from '../../i18n/errors'
 import { CampStatusBadge, FeedbackStateBadge } from './CampBadges'
 import { CampLoadError, CampPageSkeleton } from './CampLoadState'
+import { CampQrTab } from './CampQrTab'
 import { useCampDateFormat } from './campDates'
 import { statusActions, type StatusAction } from './statusActions'
 
@@ -114,7 +115,7 @@ function CampDetails({ camp }: { camp: Camp }) {
           <ServicesTab camp={camp} />
         </Tabs.Panel>
         <Tabs.Panel value="qr">
-          <ComingSoon icon={IconQrcode} text={t('camps.comingSoon.qr')} />
+          <CampQrTab camp={camp} />
         </Tabs.Panel>
         <Tabs.Panel value="feedback">
           <ComingSoon icon={IconMessageCircle} text={t('camps.comingSoon.feedback')} />
