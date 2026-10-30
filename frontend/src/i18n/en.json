@@ -229,7 +229,6 @@
       "complaints": "Complaints"
     },
     "comingSoon": {
-      "feedback": "Attendee feedback for this camp will appear here once the feedback form is ready.",
       "complaints": "Complaints raised at this camp will appear here in a later update."
     },
     "overview": {
@@ -329,7 +328,8 @@
       "CAMP_HAS_NO_SERVICES": "Add at least one service before starting the camp.",
       "INVALID_STATUS_CHANGE": "This change is not allowed from the camp's current status. Reload the page.",
       "NOT_CAMP_ORGANIZER": "Only this camp's organizer can change it.",
-      "CAMP_ACCESS_DENIED": "You do not have access to this camp."
+      "CAMP_ACCESS_DENIED": "You do not have access to this camp.",
+      "SERVICE_HAS_FEEDBACK": "A service you removed already has feedback, so it must stay. You can rename it instead."
     },
     "qr": {
       "localTitle": "Phones cannot open this link yet",
@@ -356,6 +356,24 @@
       "print": "Print or save as PDF",
       "printHint": "In the print window, choose A4 paper and turn off headers and footers. To keep a copy, choose \"Save as PDF\".",
       "noWifi": "Tip: an admin can add the camp Wi-Fi under Settings, so attendees can join the hotspot by scanning too."
+    },
+    "feedback": {
+      "analystNote": "Analysts see combined, anonymous results on the dashboards (coming in a later update), not individual feedback.",
+      "departmentOnly": "You see feedback about your department's services only.",
+      "fillIn": "Fill in for an attendee",
+      "fillInHint": "Helping someone without a phone? Open the form here and fill it in with them. It is marked as staff-assisted.",
+      "empty": "No feedback yet. Share the camp's QR code to start collecting it.",
+      "responses_one": "{{count}} response",
+      "responses_other": "{{count}} responses",
+      "average": "{{average}} / 5",
+      "answers_one": "{{count}} answer",
+      "answers_other": "{{count}} answers",
+      "generalVisit": "General visit",
+      "problem": "Problem reported",
+      "anonymous": "Anonymous",
+      "wantsReply": "Wants a reply",
+      "assistedBy": "Filled in by {{name}}",
+      "contactTitle": "Contact (shared with consent)"
     }
   },
   "settings": {
@@ -414,14 +432,83 @@
     "invalidBody": "Please scan the QR code on the camp poster again, or ask a volunteer for help.",
     "offlineTitle": "Cannot reach the camp",
     "offlineBody": "Check that your phone is connected to the camp Wi-Fi, then try again.",
-    "openTitle": "Thank you for scanning!",
-    "openBody": "The feedback form for this camp will open on this page soon. Please scan the poster again a little later.",
     "notStartedTitle": "Feedback has not opened yet",
     "notStartedBody": "This camp is not taking feedback yet. Please try again later.",
     "endedTitle": "Feedback has closed",
     "endedBody": "The feedback period for this camp has ended. Thank you for visiting.",
     "notActiveTitle": "Not taking feedback",
     "notActiveBody": "This camp is not taking feedback right now."
+  },
+  "feedbackForm": {
+    "privacyTitle": "Before you start",
+    "privacy": "Your feedback is anonymous unless you ask us to contact you. Please do not write medical details such as diagnoses or medicines.",
+    "stepOf": "Step {{step}} of {{total}}",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Send feedback",
+    "draftRestored": "We kept the answers you started earlier.",
+    "scale": {
+      "1": "Very poor",
+      "2": "Poor",
+      "3": "Okay",
+      "4": "Good",
+      "5": "Excellent"
+    },
+    "service": {
+      "title": "Which service did you visit?",
+      "general": "General visit / not sure",
+      "required": "Please choose one"
+    },
+    "ratings": {
+      "title": "How was your visit?",
+      "hint": "Tap a face for each question. Questions marked * must be answered.",
+      "required": "Please choose a face"
+    },
+    "comment": {
+      "title": "Anything else to tell us?",
+      "label": "Your comments (optional)",
+      "hint": "Please do not include medical details such as diagnoses or medicines.",
+      "placeholder": "What went well? What could be better?"
+    },
+    "problem": {
+      "label": "I want to report a problem",
+      "hint": "Staff will look into it. Describe what happened in the box above."
+    },
+    "followUp": {
+      "title": "Should we contact you about your feedback?",
+      "no": "No, keep my feedback anonymous",
+      "yes": "Yes, I would like a reply",
+      "anonymousNote": "We will not ask for your name or number.",
+      "name": "Your name (optional)",
+      "phone": "Phone number",
+      "email": "Email (optional if you give a phone number)",
+      "consent": "I agree that camp staff may contact me about this feedback. My details are used only for this.",
+      "consentRequired": "Please tick this so we may contact you",
+      "contactRequired": "Give a phone number or an email",
+      "invalidPhone": "Enter a phone number with 7 to 15 digits",
+      "invalidEmail": "Enter a valid email address"
+    },
+    "done": {
+      "title": "Thank you!",
+      "body": "Your feedback has been received. It helps us make the camp better for everyone.",
+      "problemNote": "Staff will look into the problem you reported.",
+      "another": "Give feedback for another person"
+    },
+    "already": {
+      "title": "You have already given feedback",
+      "body": "This phone has already sent feedback for this camp. Do you want to give feedback for someone else?",
+      "again": "Yes, give feedback"
+    },
+    "assisted": {
+      "banner": "Staff mode: {{name}} is filling in this form for an attendee. Read each question aloud and let them choose.",
+      "next": "Next attendee"
+    },
+    "errors": {
+      "TOO_MANY_SUBMISSIONS": "Too many forms from this phone. Please wait a few minutes and try again.",
+      "FORM_CLOSED": "This camp has stopped taking feedback.",
+      "network": "Could not send. Check that you are connected to the camp Wi-Fi and try again. Your answers are saved on this phone.",
+      "other": "Something went wrong while sending. Please try again."
+    }
   },
   "errors": {
     "forbiddenTitle": "No access",

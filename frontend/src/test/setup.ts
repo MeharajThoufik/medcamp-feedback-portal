@@ -26,6 +26,13 @@ class ResizeObserverStub {
 window.ResizeObserver = ResizeObserverStub as unknown as typeof ResizeObserver
 
 window.HTMLElement.prototype.scrollIntoView = () => {}
+window.scrollTo = () => {}
+
+// The auto-growing textarea listens for web fonts loading.
+Object.defineProperty(document, 'fonts', {
+  configurable: true,
+  value: { addEventListener: vi.fn(), removeEventListener: vi.fn(), ready: Promise.resolve() },
+})
 
 afterEach(() => {
   cleanup()

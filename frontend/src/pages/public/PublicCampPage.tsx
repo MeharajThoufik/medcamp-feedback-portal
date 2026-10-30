@@ -1,7 +1,6 @@
 import {
   Alert,
   Button,
-  Card,
   Container,
   Group,
   Skeleton,
@@ -15,21 +14,23 @@ import {
   IconClockHour4,
   IconLinkOff,
   IconMapPin,
-  IconMessageCircle,
+  IconUserHeart,
   IconWifiOff,
 } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
-import { useParams } from 'react-router'
+import { useParams, useSearchParams } from 'react-router'
+import { useMe } from '../../api/auth'
 import { ApiError } from '../../api/client'
-import { usePublicCamp } from '../../api/publicCamps'
+import { usePublicForm } from '../../api/publicCamps'
 import type { FeedbackState } from '../../api/types'
 import { AppLogo } from '../../components/AppLogo'
 import { LanguageSwitch } from '../../components/HeaderControls'
 import { useCampDateFormat } from '../camps/campDates'
+import { FeedbackFlow } from './FeedbackFlow'
 
 /**
- * The page a camp's QR code opens. Attendees never sign in. Phase 4 puts the feedback form here;
- * for now it confirms the link works and says whether the camp is taking feedback.
+ * The page a camp's QR code opens. Attendees never sign in. With `?assisted=1`, signed-in staff
+ * fill the form in for an attendee who cannot use a phone.
  */
 export function PublicCampPage() {
   const { token = '' } = useParams()
@@ -44,19 +45,32 @@ export function PublicCampPage() {
         <AppLogo />
         <LanguageSwitch />
       </Group>
-      <Container size={520} w="100%" px="md" py="xl">
+      <Container size={560} w="100%" px="md" py="lg">
         <PublicCampContent token={token} />
       </Container>
     </Stack>
   )
 }
 
+/** The signed-in staff member's name when assisted mode was asked for and is allowed. */
+function useAssistingStaff(): { pending: boolean; name: string | null } {
+  const [searchParams] = useSearchParams()
+  const wanted = searchParams.get('assisted') === '1'
+  // Attendees never trigger the "who am I" call; only the assisted link does.
+  const me = useMe(wanted)
+  if (!wanted) return { pending: false, name: null }
+  if (me.isPending) return { pending: true, name: null }
+  const allowed = me.data && me.data.role !== 'ANALYST' && !me.data.mustChangePassword
+  return { pending: false, name: allowed ? me.data!.fullName : null }
+}
+
 function PublicCampContent({ token }: { token: string }) {
   const { t } = useTranslation()
   const formatDates = useCampDateFormat()
-  const camp = usePublicCamp(token)
+  const form = usePublicForm(token)
+  const staff = useAssistingStaff()
 
-  if (camp.isPending)
+  if (form.isPending || staff.pending)
     return (
       <Stack>
         <Skeleton height={32} width="70%" />
@@ -65,8 +79,8 @@ function PublicCampContent({ token }: { token: string }) {
       </Stack>
     )
 
-  if (camp.isError) {
-    const invalidLink = camp.error instanceof ApiError && camp.error.status === 404
+  if (form.isError) {
+    const invalidLink = form.error instanceof ApiError && form.error.status === 404
     return (
       <Stack align="center" ta="center" gap="sm" py="xl">
         <ThemeIcon size={64} radius="xl" variant="light" color={invalidLink ? 'orange' : 'gray'}>
@@ -74,12 +88,12 @@ function PublicCampContent({ token }: { token: string }) {
         </ThemeIcon>
         <Title order={3}>{invalidLink ? t('public.invalidTitle') : t('public.offlineTitle')}</Title>
         <Text c="dimmed">{invalidLink ? t('public.invalidBody') : t('public.offlineBody')}</Text>
-        {!invalidLink && <Button onClick={() => void camp.refetch()}>{t('common.retry')}</Button>}
+        {!invalidLink && <Button onClick={() => void form.refetch()}>{t('common.retry')}</Button>}
       </Stack>
     )
   }
 
-  const data = camp.data
+  const data = form.data
   return (
     <Stack gap="lg">
       <Stack gap={6}>
@@ -98,29 +112,22 @@ function PublicCampContent({ token }: { token: string }) {
           </Group>
         </Group>
       </Stack>
-      <FeedbackStatus state={data.feedbackState} />
+      {staff.name && (
+        <Alert color="grape" icon={<IconUserHeart size={20} />}>
+          {t('feedbackForm.assisted.banner', { name: staff.name })}
+        </Alert>
+      )}
+      {data.feedbackState === 'OPEN' ? (
+        <FeedbackFlow token={token} form={data} assistedBy={staff.name} />
+      ) : (
+        <FormClosed state={data.feedbackState} />
+      )}
     </Stack>
   )
 }
 
-function FeedbackStatus({ state }: { state: FeedbackState }) {
+function FormClosed({ state }: { state: FeedbackState }) {
   const { t } = useTranslation()
-  if (state === 'OPEN')
-    return (
-      <Card withBorder radius="lg" p="lg">
-        <Group wrap="nowrap" align="flex-start">
-          <ThemeIcon size={44} radius="xl" variant="light">
-            <IconMessageCircle size={24} />
-          </ThemeIcon>
-          <Stack gap={4}>
-            <Text fw={600}>{t('public.openTitle')}</Text>
-            <Text size="sm" c="dimmed">
-              {t('public.openBody')}
-            </Text>
-          </Stack>
-        </Group>
-      </Card>
-    )
   const key = state === 'NOT_STARTED' ? 'notStarted' : state === 'ENDED' ? 'ended' : 'notActive'
   return (
     <Alert

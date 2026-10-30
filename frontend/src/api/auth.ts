@@ -13,8 +13,9 @@ async function fetchMe(): Promise<Me | null> {
   }
 }
 
-export function useMe() {
-  return useQuery({ queryKey: meKey, queryFn: fetchMe, staleTime: 5 * 60_000 })
+/** `enabled: false` skips the call, for pages that only sometimes need it. */
+export function useMe(enabled = true) {
+  return useQuery({ queryKey: meKey, queryFn: fetchMe, staleTime: 5 * 60_000, enabled })
 }
 
 export function useLogin() {

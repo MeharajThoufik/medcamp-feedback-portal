@@ -79,12 +79,5 @@ public final class CampDtos {
 	public record PosterWifi(String ssid, String password) {
 	}
 
-	/**
-	 * What anyone with the camp's link may see: no organizer, no internal ids. Phase 4 adds the
-	 * services attendees choose from.
-	 */
-	public record PublicCampResponse(String name, String location, LocalDate startDate, LocalDate endDate,
-			FeedbackState feedbackState) {
-	}
 
 }
