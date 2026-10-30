@@ -1,4 +1,11 @@
-import { IconBuildingHospital, IconHome, IconTent, IconUsers, type Icon } from '@tabler/icons-react'
+import {
+  IconBuildingHospital,
+  IconHome,
+  IconSettings,
+  IconTent,
+  IconUsers,
+  type Icon,
+} from '@tabler/icons-react'
 import { ROLES, type Role } from '../api/types'
 
 export interface NavItem {
@@ -33,6 +40,7 @@ export const NAVIGATION: NavSection[] = [
         icon: IconBuildingHospital,
         roles: ['SUPER_ADMIN'],
       },
+      { to: '/settings', labelKey: 'nav.settings', icon: IconSettings, roles: ['SUPER_ADMIN'] },
     ],
   },
 ]

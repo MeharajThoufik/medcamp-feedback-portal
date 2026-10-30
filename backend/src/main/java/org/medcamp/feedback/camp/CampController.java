@@ -8,10 +8,13 @@ import org.medcamp.feedback.camp.CampDtos.CampFilter;
 import org.medcamp.feedback.camp.CampDtos.CampRequest;
 import org.medcamp.feedback.camp.CampDtos.CampResponse;
 import org.medcamp.feedback.camp.CampDtos.CampSummary;
+import org.medcamp.feedback.camp.CampDtos.PosterResponse;
 import org.medcamp.feedback.camp.CampDtos.StatusRequest;
 import org.medcamp.feedback.common.PageResponse;
+import org.medcamp.feedback.qr.QrResponses;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -70,6 +73,27 @@ public class CampController {
 	public CampResponse changeStatus(@PathVariable long id, @Valid @RequestBody StatusRequest request,
 			@AuthenticationPrincipal AppUserDetails currentUser) {
 		return campManager.changeStatus(id, request.status(), currentUser);
+	}
+
+	/** The QR code for the camp's feedback link. {@code download=true} saves it as a file. */
+	@GetMapping("/{id}/qr.png")
+	public ResponseEntity<byte[]> qrCode(@PathVariable long id, @RequestParam(defaultValue = "512") int size,
+			@RequestParam(defaultValue = "false") boolean download,
+			@AuthenticationPrincipal AppUserDetails currentUser) {
+		return QrResponses.png(campManager.qrCode(id, size, currentUser), download, "camp-" + id + "-feedback-qr.png");
+	}
+
+	@GetMapping("/{id}/poster")
+	@PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ORGANIZER')")
+	public PosterResponse poster(@PathVariable long id, @AuthenticationPrincipal AppUserDetails currentUser) {
+		return campManager.poster(id, currentUser);
+	}
+
+	@PostMapping("/{id}/public-token")
+	@PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ORGANIZER')")
+	public CampResponse regeneratePublicToken(@PathVariable long id,
+			@AuthenticationPrincipal AppUserDetails currentUser) {
+		return campManager.regeneratePublicToken(id, currentUser);
 	}
 
 }

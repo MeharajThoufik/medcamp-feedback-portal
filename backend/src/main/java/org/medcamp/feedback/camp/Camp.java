@@ -67,7 +67,7 @@ public class Camp {
 	private LocalDate feedbackClosesOn;
 
 	/** Random code used in the public feedback link, so camp links cannot be guessed. */
-	@Column(nullable = false, length = 16, updatable = false)
+	@Column(nullable = false, length = 16)
 	private String publicToken;
 
 	@OneToMany(mappedBy = "camp", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -189,6 +189,11 @@ public class Camp {
 
 	public String getPublicToken() {
 		return publicToken;
+	}
+
+	/** A new token makes every printed QR code and shared link for this camp stop working. */
+	void changePublicToken(String publicToken) {
+		this.publicToken = publicToken;
 	}
 
 	/** In display order. */

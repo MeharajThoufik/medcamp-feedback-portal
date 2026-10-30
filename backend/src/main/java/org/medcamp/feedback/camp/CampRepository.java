@@ -13,6 +13,8 @@ public interface CampRepository extends JpaRepository<Camp, Long>, JpaSpecificat
 
 	boolean existsByPublicToken(String publicToken);
 
+	Optional<Camp> findByPublicToken(String publicToken);
+
 	@EntityGraph(attributePaths = { "organizer", "services", "services.department" })
 	Optional<Camp> findWithDetailsById(Long id);
 

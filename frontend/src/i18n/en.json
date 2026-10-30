@@ -39,6 +39,7 @@
     "administration": "Administration",
     "users": "Users",
     "departments": "Departments",
+    "settings": "Settings",
     "changePassword": "Change password",
     "signOut": "Sign out",
     "notifications": "Notifications",
@@ -228,7 +229,6 @@
       "complaints": "Complaints"
     },
     "comingSoon": {
-      "qr": "The QR code and printable poster for this camp will appear here in the next update.",
       "feedback": "Attendee feedback for this camp will appear here once the feedback form is ready.",
       "complaints": "Complaints raised at this camp will appear here in a later update."
     },
@@ -330,7 +330,98 @@
       "INVALID_STATUS_CHANGE": "This change is not allowed from the camp's current status. Reload the page.",
       "NOT_CAMP_ORGANIZER": "Only this camp's organizer can change it.",
       "CAMP_ACCESS_DENIED": "You do not have access to this camp."
+    },
+    "qr": {
+      "localTitle": "Phones cannot open this link yet",
+      "localBody": "The link points to this computer itself (localhost), which phones cannot reach. Start the app with the address phones use to reach this laptop, for example on the Windows hotspot:",
+      "worksBeforeOpen": "You can print the poster now. The link already works, but attendees can only give feedback while the camp is Active and inside its feedback window.",
+      "imageAlt": "QR code for {{name}}",
+      "linkLabel": "Feedback link",
+      "linkHint": "This is the link inside the QR code. Share it in a message for anyone who cannot scan.",
+      "copy": "Copy",
+      "copied": "Copied",
+      "printPoster": "Print poster",
+      "downloadPng": "Download QR image",
+      "openLink": "Open link",
+      "regenerateTitle": "Replace the link",
+      "regenerateHint": "If the link was shared where it should not be, make a new one. The old QR code and link stop working straight away, so print the poster again.",
+      "regenerate": "Make a new link",
+      "regenerateConfirm": {
+        "title": "Make a new link for this camp?",
+        "body": "Every printed poster and shared link for this camp will stop working. You will need to print the poster again."
+      },
+      "regenerated": "New link created. Print the poster again."
+    },
+    "poster": {
+      "print": "Print or save as PDF",
+      "printHint": "In the print window, choose A4 paper and turn off headers and footers. To keep a copy, choose \"Save as PDF\".",
+      "noWifi": "Tip: an admin can add the camp Wi-Fi under Settings, so attendees can join the hotspot by scanning too."
     }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Feedback links and the camp Wi-Fi printed on posters.",
+    "links": {
+      "title": "Feedback links",
+      "body": "QR codes and posters point to this address:",
+      "howToChange": "To change it, start the app with APP_PUBLIC_BASE_URL set to the new address, for example http://192.168.137.1:8080 on the Windows hotspot."
+    },
+    "wifi": {
+      "title": "Camp Wi-Fi",
+      "body": "Printed on every poster as a second QR code, so attendees can join the hotspot by scanning instead of typing.",
+      "ssid": "Network name",
+      "ssidHint": "Exactly as shown in the hotspot settings, including capital letters.",
+      "security": "Security",
+      "withPassword": "With password",
+      "open": "Open (no password)",
+      "password": "Password",
+      "passwordHint": "8 to 63 characters, as set on the hotspot.",
+      "passwordRule": "Use 8 to 63 characters: English letters, numbers and symbols",
+      "nameTooLong": "This network name is too long for Wi-Fi",
+      "saved": "Wi-Fi details saved",
+      "clear": "Remove from posters",
+      "cleared": "Wi-Fi removed from posters",
+      "clearConfirm": {
+        "title": "Remove the camp Wi-Fi?",
+        "body": "Posters printed from now on will show only the feedback QR code."
+      },
+      "previewAlt": "Wi-Fi QR code for {{ssid}}",
+      "previewHint": "Scan it with a phone to test it before printing.",
+      "notSet": "No camp Wi-Fi set. Posters will show only the feedback QR code."
+    },
+    "errors": {
+      "WIFI_PASSWORD_INVALID": "Use 8 to 63 characters: English letters, numbers and symbols.",
+      "WIFI_NAME_TOO_LONG": "This network name is too long for Wi-Fi."
+    }
+  },
+  "poster": {
+    "title": "Tell us about your visit",
+    "subtitle": "Your feedback helps us improve this camp.",
+    "wifiStep": "Join the camp Wi-Fi",
+    "scanStep": "Scan to give feedback",
+    "network": "Network",
+    "password": "Password",
+    "noPassword": "none",
+    "typeLink": "Or type this address in your phone's browser",
+    "how1": "Open your phone camera and point it at the code.",
+    "how2": "Tap the link that appears on the screen.",
+    "how3": "No app or account needed. It takes about 2 minutes.",
+    "help": "Need help? Ask any volunteer at the help desk."
+  },
+  "public": {
+    "welcome": "Feedback for",
+    "invalidTitle": "This link is not valid",
+    "invalidBody": "Please scan the QR code on the camp poster again, or ask a volunteer for help.",
+    "offlineTitle": "Cannot reach the camp",
+    "offlineBody": "Check that your phone is connected to the camp Wi-Fi, then try again.",
+    "openTitle": "Thank you for scanning!",
+    "openBody": "The feedback form for this camp will open on this page soon. Please scan the poster again a little later.",
+    "notStartedTitle": "Feedback has not opened yet",
+    "notStartedBody": "This camp is not taking feedback yet. Please try again later.",
+    "endedTitle": "Feedback has closed",
+    "endedBody": "The feedback period for this camp has ended. Thank you for visiting.",
+    "notActiveTitle": "Not taking feedback",
+    "notActiveBody": "This camp is not taking feedback right now."
   },
   "errors": {
     "forbiddenTitle": "No access",

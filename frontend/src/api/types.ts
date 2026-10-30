@@ -77,6 +77,8 @@ export interface Camp {
   feedbackOpensOn: string
   feedbackClosesOn: string
   publicToken: string
+  /** The link inside the camp's QR code. */
+  feedbackUrl: string
   organizerId: number
   organizerName: string
   services: CampServiceItem[]
@@ -91,4 +93,40 @@ export interface OrganizerOption {
   id: number
   fullName: string
   email: string
+}
+
+/** What the printable poster shows. */
+export interface Poster {
+  campId: number
+  name: string
+  location: string
+  startDate: string
+  endDate: string
+  feedbackUrl: string
+  /** Null when no camp Wi-Fi is set. */
+  wifi: { ssid: string; password: string | null } | null
+}
+
+export type WifiSecurity = 'WPA' | 'NONE'
+
+export interface WifiNetwork {
+  ssid: string
+  /** Null for an open network. */
+  password: string | null
+  security: WifiSecurity
+}
+
+export interface Settings {
+  /** Where feedback links point, from `APP_PUBLIC_BASE_URL`. */
+  publicBaseUrl: string
+  wifi: WifiNetwork | null
+}
+
+/** What anyone with a camp's link may see. */
+export interface PublicCamp {
+  name: string
+  location: string
+  startDate: string
+  endDate: string
+  feedbackState: FeedbackState
 }

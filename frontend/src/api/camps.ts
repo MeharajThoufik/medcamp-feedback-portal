@@ -1,6 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from './client'
-import type { Camp, CampStatus, CampSummary, OrganizerOption, Page } from './types'
+import type { Camp, CampStatus, CampSummary, OrganizerOption, Page, Poster } from './types'
 
 export interface CampFilters {
   search: string
@@ -101,5 +101,39 @@ export function useChangeCampStatus() {
     mutationFn: ({ id, status }: { id: number; status: CampStatus }) =>
       api<Camp>(`/camps/${id}/status`, { method: 'PUT', json: { status } }),
     onSuccess: store,
+  })
+}
+
+/**
+ * Address of the camp's QR image. `version` (the public token) changes when the link is
+ * regenerated, so the browser never shows an old code.
+ */
+export function campQrUrl(
+  id: number,
+  version: string,
+  options: { size?: number; download?: boolean } = {},
+) {
+  const params = new URLSearchParams({ size: String(options.size ?? 512), v: version })
+  if (options.download) params.set('download', 'true')
+  return `/api/camps/${id}/qr.png?${params}`
+}
+
+export function useCampPoster(id: number) {
+  return useQuery({
+    queryKey: ['camps', 'poster', id],
+    queryFn: () => api<Poster>(`/camps/${id}/poster`),
+  })
+}
+
+/** Gives the camp a new link; printed QR codes for the old one stop working. */
+export function useRegenerateCampLink() {
+  const store = useStoreCamp()
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => api<Camp>(`/camps/${id}/public-token`, { method: 'POST' }),
+    onSuccess: (camp) => {
+      store(camp)
+      void queryClient.invalidateQueries({ queryKey: ['camps', 'poster', camp.id] })
+    },
   })
 }

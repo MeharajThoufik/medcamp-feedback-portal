@@ -17,6 +17,7 @@
 	<properties>
 		<java.version>21</java.version>
 		<springdoc.version>3.2.0</springdoc.version>
+		<zxing.version>3.5.4</zxing.version>
 		<frontend-maven-plugin.version>2.0.2</frontend-maven-plugin.version>
 		<node.version>v24.14.0</node.version>
 		<!-- Frontend build: -Dskip.frontend=true skips it for backend-only work -->
@@ -51,6 +52,12 @@
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>${springdoc.version}</version>
+		</dependency>
+		<dependency>
+			<!-- QR codes; images are written with javax.imageio, so zxing:javase is not needed -->
+			<groupId>com.google.zxing</groupId>
+			<artifactId>core</artifactId>
+			<version>${zxing.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.flywaydb</groupId>
