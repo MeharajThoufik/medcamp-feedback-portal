@@ -1,5 +1,11 @@
 import { Button, Card, Group, SimpleGrid, Stack, Text, ThemeIcon, Title } from '@mantine/core'
-import { IconBuildingHospital, IconHourglassHigh, IconUsers } from '@tabler/icons-react'
+import {
+  IconBuildingHospital,
+  IconHourglassHigh,
+  IconPlus,
+  IconTent,
+  IconUsers,
+} from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { useCurrentUser } from '../auth/useCurrentUser'
@@ -21,10 +27,33 @@ export function HomePage() {
           {me.departmentName && (
             <Text size="sm">{t('home.department', { name: me.departmentName })}</Text>
           )}
+          {me.role === 'ORGANIZER' && (
+            <Group mt="sm">
+              <Button component={Link} to="/camps/new" leftSection={<IconPlus size={18} />}>
+                {t('home.createCamp')}
+              </Button>
+              <Button
+                component={Link}
+                to="/camps"
+                variant="light"
+                leftSection={<IconTent size={18} />}
+              >
+                {t('home.viewCamps')}
+              </Button>
+            </Group>
+          )}
           {me.role === 'SUPER_ADMIN' && (
             <Group mt="sm">
               <Button component={Link} to="/users" leftSection={<IconUsers size={18} />}>
                 {t('home.manageUsers')}
+              </Button>
+              <Button
+                component={Link}
+                to="/camps"
+                variant="light"
+                leftSection={<IconTent size={18} />}
+              >
+                {t('home.viewCamps')}
               </Button>
               <Button
                 component={Link}

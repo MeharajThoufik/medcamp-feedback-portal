@@ -14,7 +14,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/** Calls every Phase 1 endpoint directly as each role, so access rules are enforced by the server. */
+/**
+ * Calls every user, department and account endpoint directly as each role, so access rules are
+ * enforced by the server. Camp rules are in CampAccessTests.
+ */
 class RoleAccessTests extends ApiTestSupport {
 
 	@ParameterizedTest
@@ -26,6 +29,7 @@ class RoleAccessTests extends ApiTestSupport {
 
 		mvc.perform(get("/api/users").with(as(caller))).andExpect(allowed);
 		mvc.perform(get("/api/users/{id}", target.getId()).with(as(caller))).andExpect(allowed);
+		mvc.perform(get("/api/users/organizers").with(as(caller))).andExpect(allowed);
 		mvc.perform(post("/api/users").with(as(caller))
 			.with(csrf())
 			.contentType(MediaType.APPLICATION_JSON)

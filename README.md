@@ -16,7 +16,8 @@ Planning documents are in [`docs/`](docs/).
 |---|---|---|
 | 0 | Foundation: build, database migrations, API conventions, app shell | Done |
 | 1 | Login, roles, user and department management | Done |
-| 2–9 | Camps, QR codes, feedback form, complaints, dashboards | Planned |
+| 2 | Camps: services, dates, feedback window, status, organizer-only editing | Done |
+| 3–9 | QR codes, feedback form, complaints, dashboards | Planned |
 
 ## Requirements
 

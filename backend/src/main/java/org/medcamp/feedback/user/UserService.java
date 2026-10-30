@@ -12,6 +12,7 @@ import org.medcamp.feedback.common.PageResponse;
 import org.medcamp.feedback.department.Department;
 import org.medcamp.feedback.department.DepartmentService;
 import org.medcamp.feedback.user.UserDtos.CreatedUserResponse;
+import org.medcamp.feedback.user.UserDtos.OrganizerOption;
 import org.medcamp.feedback.user.UserDtos.TemporaryPasswordResponse;
 import org.medcamp.feedback.user.UserDtos.UserRequest;
 import org.medcamp.feedback.user.UserDtos.UserResponse;
@@ -54,6 +55,15 @@ public class UserService {
 	@Transactional(readOnly = true)
 	public UserResponse get(long id) {
 		return toResponse(getEntity(id));
+	}
+
+	/** Enabled organizers, for choosing who runs a camp. */
+	@Transactional(readOnly = true)
+	public List<OrganizerOption> listOrganizers() {
+		return users.findByRoleAndEnabledTrueOrderByFullNameAsc(Role.ORGANIZER)
+			.stream()
+			.map(OrganizerOption::from)
+			.toList();
 	}
 
 	public CreatedUserResponse create(UserRequest request) {

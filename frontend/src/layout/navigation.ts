@@ -1,4 +1,4 @@
-import { IconBuildingHospital, IconHome, IconUsers, type Icon } from '@tabler/icons-react'
+import { IconBuildingHospital, IconHome, IconTent, IconUsers, type Icon } from '@tabler/icons-react'
 import { ROLES, type Role } from '../api/types'
 
 export interface NavItem {
@@ -14,10 +14,14 @@ export interface NavSection {
   items: NavItem[]
 }
 
-/** Menu entries per role. Later phases add Camps, Complaints and Dashboards here. */
+/** Menu entries per role. Later phases add Complaints and Dashboards here. */
 export const NAVIGATION: NavSection[] = [
   {
-    items: [{ to: '/', labelKey: 'nav.home', icon: IconHome, roles: ROLES }],
+    items: [
+      { to: '/', labelKey: 'nav.home', icon: IconHome, roles: ROLES },
+      // Every role sees camps; the server limits which ones (see CampManager).
+      { to: '/camps', labelKey: 'nav.camps', icon: IconTent, roles: ROLES },
+    ],
   },
   {
     titleKey: 'nav.administration',

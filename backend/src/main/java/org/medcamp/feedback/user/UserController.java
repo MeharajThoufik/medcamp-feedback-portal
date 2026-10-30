@@ -1,9 +1,12 @@
 package org.medcamp.feedback.user;
 
+import java.util.List;
+
 import jakarta.validation.Valid;
 import org.medcamp.feedback.auth.AppUserDetails;
 import org.medcamp.feedback.common.PageResponse;
 import org.medcamp.feedback.user.UserDtos.CreatedUserResponse;
+import org.medcamp.feedback.user.UserDtos.OrganizerOption;
 import org.medcamp.feedback.user.UserDtos.SetEnabledRequest;
 import org.medcamp.feedback.user.UserDtos.TemporaryPasswordResponse;
 import org.medcamp.feedback.user.UserDtos.UserRequest;
@@ -37,6 +40,11 @@ public class UserController {
 			@RequestParam(required = false) Role role, @RequestParam(required = false) Boolean enabled,
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
 		return userService.list(search, role, enabled, page, size);
+	}
+
+	@GetMapping("/organizers")
+	public List<OrganizerOption> organizers() {
+		return userService.listOrganizers();
 	}
 
 	@GetMapping("/{id}")
