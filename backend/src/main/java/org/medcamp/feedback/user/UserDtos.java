@@ -40,4 +40,13 @@ public final class UserDtos {
 	public record TemporaryPasswordResponse(String temporaryPassword) {
 	}
 
+	/** An organizer a Super Admin can assign to a camp. */
+	public record OrganizerOption(Long id, String fullName, String email) {
+
+		static OrganizerOption from(User user) {
+			return new OrganizerOption(user.getId(), user.getFullName(), user.getEmail());
+		}
+
+	}
+
 }

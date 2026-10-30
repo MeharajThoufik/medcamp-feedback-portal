@@ -35,6 +35,7 @@
   },
   "nav": {
     "home": "Home",
+    "camps": "Camps",
     "administration": "Administration",
     "users": "Users",
     "departments": "Departments",
@@ -78,15 +79,17 @@
     "greeting": "Welcome, {{name}}",
     "roleInfo": {
       "SUPER_ADMIN": "You manage user accounts and departments, and you can see every camp.",
-      "ORGANIZER": "You will create camps, share their QR codes and handle complaints for your camps.",
+      "ORGANIZER": "You create camps, share their QR codes and handle complaints for your camps.",
       "MEDICAL_STAFF": "You will see feedback and complaints for your department.",
       "ANALYST": "You will see combined, anonymous results across camps."
     },
     "department": "Department: {{name}}",
     "nextTitle": "Coming next",
-    "next": "Camps, QR codes, the feedback form, complaints and dashboards will appear here as each phase is finished.",
+    "next": "QR codes, the feedback form, complaints and dashboards will appear here as each phase is finished.",
     "manageUsers": "Manage users",
-    "manageDepartments": "Manage departments"
+    "manageDepartments": "Manage departments",
+    "createCamp": "Create a camp",
+    "viewCamps": "View camps"
   },
   "users": {
     "title": "Users",
@@ -173,6 +176,160 @@
     "updated": "Department updated",
     "errors": {
       "DEPARTMENT_NAME_TAKEN": "A department with this name already exists."
+    }
+  },
+  "camps": {
+    "title": "Camps",
+    "subtitle": {
+      "SUPER_ADMIN": "Every medical camp, its services and whether feedback is open.",
+      "ORGANIZER": "The camps you organize.",
+      "MEDICAL_STAFF": "Camps that offer a service of your department.",
+      "ANALYST": "Every camp, for reading only."
+    },
+    "add": "New camp",
+    "edit": "Edit",
+    "backToList": "All camps",
+    "backToCamp": "Back to camp",
+    "searchPlaceholder": "Search by camp name or location",
+    "statusFilter": "Status",
+    "notArchived": "All except archived",
+    "dateFilter": "Camp dates",
+    "organizerFilter": "Organizer",
+    "allOrganizers": "All organizers",
+    "empty": "No camps to show yet.",
+    "emptyCanCreate": "No camps yet. Create your first camp, add its services, then start it when attendees can give feedback.",
+    "noMatches": "No camps match these filters.",
+    "count_one": "{{count}} camp",
+    "count_other": "{{count}} camps",
+    "columns": {
+      "camp": "Camp",
+      "dates": "Dates",
+      "status": "Status",
+      "organizer": "Organizer",
+      "services": "Services"
+    },
+    "status": {
+      "UPCOMING": "Upcoming",
+      "ACTIVE": "Active",
+      "CLOSED": "Closed",
+      "ARCHIVED": "Archived"
+    },
+    "feedbackState": {
+      "OPEN": "Feedback open",
+      "NOT_STARTED": "Feedback not started",
+      "ENDED": "Feedback ended",
+      "CAMP_NOT_ACTIVE": "Feedback closed"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "services": "Services ({{count}})",
+      "qr": "QR code",
+      "feedback": "Feedback",
+      "complaints": "Complaints"
+    },
+    "comingSoon": {
+      "qr": "The QR code and printable poster for this camp will appear here in the next update.",
+      "feedback": "Attendee feedback for this camp will appear here once the feedback form is ready.",
+      "complaints": "Complaints raised at this camp will appear here in a later update."
+    },
+    "overview": {
+      "dates": "Camp dates",
+      "location": "Location",
+      "organizer": "Organizer",
+      "feedbackWindow": "Feedback window"
+    },
+    "services": {
+      "empty": "No services yet. Attendees choose the service they used when they give feedback, so add at least one before starting the camp.",
+      "add": "Add services"
+    },
+    "notice": {
+      "openTitle": "Feedback is open",
+      "open": "Attendees can give feedback until {{closes}}.",
+      "notStartedTitle": "Feedback has not started",
+      "notStarted": "The camp is active, but the feedback window opens on {{opens}}.",
+      "endedTitle": "The feedback window has ended",
+      "ended": "The window closed on {{closes}}. Edit the camp to extend it, or close the camp.",
+      "closedTitle": "Feedback is closed",
+      "upcoming": "Start the camp to open feedback. The window runs from {{opens}} to {{closes}}.",
+      "closed": "Feedback is closed because the camp is {{status}}.",
+      "needsServices": "Add at least one service before starting the camp."
+    },
+    "actions": {
+      "start": "Start camp",
+      "startDone": "The camp is now active.",
+      "reopen": "Reopen",
+      "reopenDone": "The camp is active again.",
+      "close": "Close camp",
+      "closeDone": "The camp is closed.",
+      "closeConfirm": {
+        "title": "Close {{name}}?",
+        "body": "Attendees will no longer be able to give feedback. You can reopen the camp later."
+      },
+      "archive": "Archive",
+      "archiveDone": "The camp is archived.",
+      "archiveConfirm": {
+        "title": "Archive {{name}}?",
+        "body": "Archived camps are hidden from the camp list and cannot be edited. You can restore them later."
+      },
+      "restore": "Restore",
+      "restoreDone": "The camp is restored as Closed."
+    },
+    "form": {
+      "createTitle": "New camp",
+      "editTitle": "Edit camp",
+      "detailsSection": "Camp details",
+      "name": "Camp name",
+      "namePlaceholder": "For example: Rampur Eye and Dental Camp",
+      "location": "Location",
+      "locationPlaceholder": "For example: Government School, Rampur",
+      "organizer": "Organizer",
+      "organizerHint": "The organizer manages this camp and its complaints.",
+      "organizerPlaceholder": "Choose an organizer",
+      "noOrganizers": "No active organizers. Add a user with the Organizer role first.",
+      "datesSection": "Dates",
+      "campDates": "Camp dates",
+      "campDatesHint": "Pick the first and last day. For a one-day camp, pick the same day twice.",
+      "pickDates": "Pick dates",
+      "feedbackWindow": "Feedback window",
+      "feedbackWindowHint": "Days when attendees can use the form while the camp is active. By default, until 7 days after the camp.",
+      "servicesSection": "Services",
+      "servicesHint": "What the camp offers, with the department for each. Attendees pick one when they give feedback.",
+      "noServicesYet": "No services yet. You can save now and add them later, but the camp cannot start without one.",
+      "noDepartments": "No departments exist yet. Ask the Super Admin to add them.",
+      "noDepartmentsAdmin": "No departments exist yet. Add them first on this page:",
+      "serviceDepartment": "Department",
+      "serviceName": "Service name",
+      "serviceNamePlaceholder": "For example: Cataract screening",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "removeService": "Remove service",
+      "addService": "Add service",
+      "createSubmit": "Create camp",
+      "created": "Camp created",
+      "updated": "Camp updated",
+      "archivedTitle": "This camp is archived",
+      "archivedBody": "Archived camps cannot be edited. Restore the camp first."
+    },
+    "validation": {
+      "datesRequired": "Pick the first and last day of the camp",
+      "windowRequired": "Pick when feedback opens and closes",
+      "windowBeforeCamp": "The feedback window cannot close before the camp starts",
+      "duplicateService": "This service is already listed",
+      "tooManyServices": "A camp can have up to 50 services"
+    },
+    "errors": {
+      "INVALID_DATES": "The end date must be on or after the start date.",
+      "INVALID_FEEDBACK_WINDOW": "The feedback window cannot close before it opens or before the camp starts.",
+      "ORGANIZER_REQUIRED": "Choose the organizer for this camp.",
+      "ORGANIZER_INVALID": "Choose an active user with the Organizer role.",
+      "SERVICE_NAME_DUPLICATE": "Two services have the same name. Give each one a different name.",
+      "SERVICE_NOT_FOUND": "One of the services was changed by someone else. Reload the page and try again.",
+      "DEPARTMENT_INACTIVE": "One of the chosen departments is inactive. Choose another one.",
+      "CAMP_ARCHIVED": "Archived camps cannot be edited. Restore the camp first.",
+      "CAMP_HAS_NO_SERVICES": "Add at least one service before starting the camp.",
+      "INVALID_STATUS_CHANGE": "This change is not allowed from the camp's current status. Reload the page.",
+      "NOT_CAMP_ORGANIZER": "Only this camp's organizer can change it.",
+      "CAMP_ACCESS_DENIED": "You do not have access to this camp."
     }
   },
   "errors": {

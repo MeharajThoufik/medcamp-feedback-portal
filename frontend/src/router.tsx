@@ -1,6 +1,9 @@
 import { createBrowserRouter } from 'react-router'
 import { RequireAuth, RequireRole } from './auth/guards'
 import { AppLayout } from './layout/AppLayout'
+import { CampDetailsPage } from './pages/camps/CampDetailsPage'
+import { EditCampPage, NewCampPage } from './pages/camps/CampFormPage'
+import { CampsPage } from './pages/camps/CampsPage'
 import { ChangePasswordPage, ForcedChangePasswordPage } from './pages/ChangePasswordPage'
 import { DepartmentsPage } from './pages/DepartmentsPage'
 import { NotFoundPage } from './pages/ErrorPages'
@@ -26,6 +29,24 @@ export const router = createBrowserRouter([
     ),
     children: [
       { index: true, element: <HomePage /> },
+      { path: 'camps', element: <CampsPage /> },
+      {
+        path: 'camps/new',
+        element: (
+          <RequireRole roles={['SUPER_ADMIN', 'ORGANIZER']}>
+            <NewCampPage />
+          </RequireRole>
+        ),
+      },
+      { path: 'camps/:id', element: <CampDetailsPage /> },
+      {
+        path: 'camps/:id/edit',
+        element: (
+          <RequireRole roles={['SUPER_ADMIN', 'ORGANIZER']}>
+            <EditCampPage />
+          </RequireRole>
+        ),
+      },
       {
         path: 'users',
         element: (

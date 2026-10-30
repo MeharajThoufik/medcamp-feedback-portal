@@ -1,5 +1,6 @@
 package org.medcamp.feedback.user;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -15,6 +16,8 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
 	@EntityGraph(attributePaths = "department")
 	Optional<User> findWithDepartmentById(Long id);
+
+	List<User> findByRoleAndEnabledTrueOrderByFullNameAsc(Role role);
 
 	boolean existsByEmail(String email);
 
