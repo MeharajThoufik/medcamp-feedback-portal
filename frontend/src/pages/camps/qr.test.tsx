@@ -1,10 +1,9 @@
 import { render, screen } from '@testing-library/react'
 import { MantineProvider } from '@mantine/core'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import type { Camp, Poster } from '../../api/types'
-import { jsonResponse, renderPage, signedInAs } from '../../test/renderPage'
+import { renderPage, signedInAs } from '../../test/renderPage'
 import { theme } from '../../theme'
-import { PublicCampPage } from '../public/PublicCampPage'
 import { PosterSheet } from './CampPosterPage'
 import { CampQrTab } from './CampQrTab'
 import { isLocalOnlyLink } from './links'
@@ -113,50 +112,5 @@ describe('PosterSheet', () => {
       'src',
       expect.stringContaining('/api/settings/wifi/qr.png'),
     )
-  })
-})
-
-describe('PublicCampPage', () => {
-  function renderPublic(token: string) {
-    renderPage(
-      signedInAs('ANALYST'),
-      [{ path: '/f/:token', element: <PublicCampPage /> }],
-      `/f/${token}`,
-    )
-  }
-
-  it('confirms the link works for an open camp, without asking anyone to sign in', async () => {
-    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      jsonResponse(200, {
-        name: 'Rampur Eye Camp',
-        location: 'Government School, Rampur',
-        startDate: '2026-11-02',
-        endDate: '2026-11-03',
-        feedbackState: 'OPEN',
-      }),
-    )
-    renderPublic('dKGwhkcu')
-
-    expect(await screen.findByText('Rampur Eye Camp')).toBeInTheDocument()
-    expect(screen.getByText('Thank you for scanning!')).toBeInTheDocument()
-    expect(fetchMock).toHaveBeenCalledTimes(1)
-    expect(String(fetchMock.mock.calls[0][0])).toBe('/api/public/camps/dKGwhkcu')
-  })
-
-  it('explains an invalid link', async () => {
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      jsonResponse(404, { code: 'CAMP_LINK_INVALID', detail: 'This feedback link is not valid.' }),
-    )
-    renderPublic('nope1234')
-
-    expect(await screen.findByText('This link is not valid')).toBeInTheDocument()
-  })
-
-  it('points to the camp Wi-Fi when the server cannot be reached', async () => {
-    vi.spyOn(globalThis, 'fetch').mockRejectedValue(new TypeError('Failed to fetch'))
-    renderPublic('dKGwhkcu')
-
-    expect(await screen.findByText('Cannot reach the camp')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument()
   })
 })

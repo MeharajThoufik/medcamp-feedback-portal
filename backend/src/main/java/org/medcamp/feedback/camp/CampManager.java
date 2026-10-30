@@ -1,6 +1,5 @@
 package org.medcamp.feedback.camp;
 
-import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,12 +21,10 @@ import org.medcamp.feedback.camp.CampDtos.CampResponse;
 import org.medcamp.feedback.camp.CampDtos.CampSummary;
 import org.medcamp.feedback.camp.CampDtos.PosterResponse;
 import org.medcamp.feedback.camp.CampDtos.PosterWifi;
-import org.medcamp.feedback.camp.CampDtos.PublicCampResponse;
 import org.medcamp.feedback.camp.CampDtos.ServiceRequest;
 import org.medcamp.feedback.camp.CampDtos.ServiceResponse;
 import org.medcamp.feedback.common.ApiException;
 import org.medcamp.feedback.common.PageResponse;
-import org.medcamp.feedback.config.AppProperties;
 import org.medcamp.feedback.department.Department;
 import org.medcamp.feedback.department.DepartmentService;
 import org.medcamp.feedback.qr.FeedbackLinks;
@@ -64,12 +61,11 @@ public class CampManager {
 	private final FeedbackLinks feedbackLinks;
 	private final QrCodeWriter qrCodeWriter;
 	private final SettingsService settingsService;
-	private final Clock clock;
-	private final AppProperties properties;
+	private final CampCalendar calendar;
 
 	public CampManager(CampRepository camps, UserRepository users, DepartmentService departmentService,
 			PublicTokenGenerator tokenGenerator, FeedbackLinks feedbackLinks, QrCodeWriter qrCodeWriter,
-			SettingsService settingsService, Clock clock, AppProperties properties) {
+			SettingsService settingsService, CampCalendar calendar) {
 		this.camps = camps;
 		this.users = users;
 		this.departmentService = departmentService;
@@ -77,15 +73,14 @@ public class CampManager {
 		this.feedbackLinks = feedbackLinks;
 		this.qrCodeWriter = qrCodeWriter;
 		this.settingsService = settingsService;
-		this.clock = clock;
-		this.properties = properties;
+		this.calendar = calendar;
 	}
 
 	@Transactional(readOnly = true)
 	public PageResponse<CampSummary> list(CampFilter filter, int page, int size, AppUserDetails me) {
 		PageRequest pageRequest = PageRequest.of(Math.max(page, 0), Math.clamp(size, 1, MAX_PAGE_SIZE),
 				Sort.by(Sort.Direction.DESC, "startDate").and(Sort.by(Sort.Direction.DESC, "id")));
-		LocalDate today = today();
+		LocalDate today = calendar.today();
 		return PageResponse
 			.of(camps.findAll(visibleTo(me).and(matching(filter)), pageRequest).map(c -> CampSummary.from(c, today)));
 	}
@@ -122,18 +117,26 @@ public class CampManager {
 	}
 
 	/**
-	 * Looks up a camp by the token in its public link. Archived camps and malformed tokens look
-	 * the same as unknown ones.
+	 * Finds the camp behind a public link. Archived camps and malformed tokens look the same as
+	 * unknown ones, so the link reveals nothing.
 	 */
 	@Transactional(readOnly = true)
-	public PublicCampResponse findPublic(String token) {
+	public Optional<Camp> findByPublicLink(String token) {
 		return Optional.ofNullable(token)
 			.filter(t -> t.matches("[A-Za-z0-9]{4,16}"))
-			.flatMap(camps::findByPublicToken)
-			.filter(camp -> camp.getStatus() != CampStatus.ARCHIVED)
-			.map(camp -> new PublicCampResponse(camp.getName(), camp.getLocation(), camp.getStartDate(),
-					camp.getEndDate(), camp.feedbackState(today())))
-			.orElseThrow(() -> ApiException.notFound("CAMP_LINK_INVALID", "This feedback link is not valid."));
+			.flatMap(camps::findWithDetailsByPublicToken)
+			.filter(camp -> camp.getStatus() != CampStatus.ARCHIVED);
+	}
+
+	/** The camp, if this user may see it; for other modules that show a camp's data. */
+	@Transactional(readOnly = true)
+	public Camp requireViewable(long id, AppUserDetails me) {
+		return getEntityForView(id, me);
+	}
+
+	/** Super Admins and the camp's own organizer manage it and may see attendees' contact details. */
+	public static boolean canManage(Camp camp, AppUserDetails me) {
+		return canEdit(camp, me);
 	}
 
 	public CampResponse create(CampRequest request, AppUserDetails me) {
@@ -211,6 +214,12 @@ public class CampManager {
 				service.setName(name);
 			}
 			ordered.add(service);
+		}
+		for (CampService removed : existing.values()) {
+			if (camps.hasFeedbackForService(removed.getId())) {
+				throw ApiException.conflict("SERVICE_HAS_FEEDBACK", "\"" + removed.getName()
+						+ "\" already has feedback, so it cannot be removed. You can rename it instead.");
+			}
 		}
 		camp.keepServices(ordered);
 	}
@@ -360,15 +369,12 @@ public class CampManager {
 		List<CampStatus> nextStatuses = canEdit
 				? Arrays.stream(CampStatus.values()).filter(camp.getStatus()::canMoveTo).toList() : List.of();
 		return new CampResponse(camp.getId(), camp.getName(), camp.getLocation(), camp.getStartDate(),
-				camp.getEndDate(), camp.getStatus(), camp.feedbackState(today()), camp.getFeedbackOpensOn(),
-				camp.getFeedbackClosesOn(), camp.getPublicToken(), feedbackLinks.forToken(camp.getPublicToken()),
-				camp.getOrganizer().getId(), camp.getOrganizer().getFullName(), camp.getServices().stream().map(ServiceResponse::from).toList(),
+				camp.getEndDate(), camp.getStatus(), camp.feedbackState(calendar.today()),
+				camp.getFeedbackOpensOn(), camp.getFeedbackClosesOn(), camp.getPublicToken(),
+				feedbackLinks.forToken(camp.getPublicToken()), camp.getOrganizer().getId(),
+				camp.getOrganizer().getFullName(), camp.getServices().stream().map(ServiceResponse::from).toList(),
 				canEdit, nextStatuses, camp.getCreatedAt(), camp.getUpdatedAt());
 	}
 
-	/** Camp dates are calendar days where the camps run, not in UTC. */
-	private LocalDate today() {
-		return LocalDate.now(clock.withZone(properties.timeZone()));
-	}
 
 }

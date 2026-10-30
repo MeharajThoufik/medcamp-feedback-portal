@@ -19,7 +19,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
-abstract class CampTestSupport extends ApiTestSupport {
+/** Camp helpers, also used by the feedback tests. */
+public abstract class CampTestSupport extends ApiTestSupport {
 
 	/** "Today" as the app sees it (the default camp time zone). */
 	protected static final LocalDate TODAY = LocalDate.now(ZoneId.of("Asia/Kolkata"));
@@ -44,6 +45,17 @@ abstract class CampTestSupport extends ApiTestSupport {
 		}
 		camp.keepServices(new ArrayList<>(camp.getServices()));
 		return camps.save(camp);
+	}
+
+	/** Saves an Active camp, open for feedback today. */
+	protected Camp openCamp(String name, User organizer, Department... departments) {
+		Camp camp = camp(name, organizer, departments);
+		camp.setStatus(CampStatus.ACTIVE);
+		return camp;
+	}
+
+	protected String json(Object body) {
+		return jsonMapper.writeValueAsString(body);
 	}
 
 	/** A valid create/update body; tests change single fields with {@code with}. */

@@ -121,12 +121,60 @@ export interface Settings {
   publicBaseUrl: string
   wifi: WifiNetwork | null
 }
+export interface RatingCategory {
+  code: string
+  labelEn: string
+  labelHi: string
+  /** Attendees must answer it. */
+  required: boolean
+}
 
-/** What anyone with a camp's link may see. */
-export interface PublicCamp {
+/** What the attendee form needs; anyone with the camp's link may see it. */
+export interface PublicForm {
   name: string
   location: string
   startDate: string
   endDate: string
   feedbackState: FeedbackState
+  services: { id: number; name: string; departmentName: string }[]
+  categories: RatingCategory[]
+}
+
+export type FormLanguage = 'en' | 'hi'
+
+export interface FeedbackSubmission {
+  submissionToken: string
+  language: FormLanguage
+  /** Null for "general visit / not sure". */
+  serviceId: number | null
+  /** Category code to a score from 1 to 5; skipped categories are left out. */
+  ratings: Record<string, number>
+  comment: string | null
+  problemReported: boolean
+  followUp: { consent: boolean; name: string; phone: string; email: string } | null
+  /** Accepted only from signed-in staff filling the form in for an attendee. */
+  assisted: boolean
+}
+
+/** One feedback entry as staff see it. */
+export interface FeedbackItem {
+  id: number
+  submittedAt: string
+  serviceId: number | null
+  serviceName: string | null
+  departmentName: string | null
+  ratings: Record<string, number>
+  comment: string | null
+  problemReported: boolean
+  language: FormLanguage
+  anonymous: boolean
+  assisted: boolean
+  assistedByName: string | null
+  /** Only for the camp's managers, and only when the attendee agreed to be contacted. */
+  contact: { name: string | null; phone: string | null; email: string | null } | null
+}
+
+export interface FeedbackSummary {
+  total: number
+  categories: (Omit<RatingCategory, 'required'> & { average: number | null; count: number })[]
 }
