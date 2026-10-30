@@ -18,6 +18,10 @@ const FORM: PublicForm = {
     { code: 'WAITING_TIME', labelEn: 'Waiting time', labelHi: 'इंतज़ार का समय', required: false },
     { code: 'OVERALL', labelEn: 'Overall experience', labelHi: 'कुल मिलाकर अनुभव', required: true },
   ],
+  complaintCategories: [
+    { code: 'WAITING', labelEn: 'Long wait or crowding', labelHi: 'लंबा इंतज़ार या भीड़' },
+    { code: 'CLEANLINESS', labelEn: 'Cleanliness or hygiene', labelHi: 'साफ़-सफ़ाई' },
+  ],
 }
 
 function renderPublic(path = '/f/dKGwhkcu') {
@@ -31,8 +35,12 @@ function mockServer(form: PublicForm = FORM) {
     const url = String(input)
     if (url.endsWith('/form-token')) return jsonResponse(200, { submissionToken: 'tok-1' })
     if (url.endsWith('/feedback')) {
-      submitted.push(JSON.parse(String(init?.body)))
-      return jsonResponse(201, { submittedAt: '2026-11-02T05:00:00Z' })
+      const body = JSON.parse(String(init?.body))
+      submitted.push(body)
+      return jsonResponse(201, {
+        submittedAt: '2026-11-02T05:00:00Z',
+        complaintReference: body.complaint ? 'MC-26-K7Q2XP' : null,
+      })
     }
     return jsonResponse(200, form)
   })
@@ -108,7 +116,7 @@ describe('PublicCampPage', () => {
         serviceId: 11,
         ratings: { OVERALL: 5 },
         comment: 'साफ़-सफ़ाई अच्छी थी',
-        problemReported: false,
+        complaint: null,
         followUp: null,
         assisted: false,
         submissionToken: 'tok-1',
@@ -116,6 +124,45 @@ describe('PublicCampPage', () => {
     ])
     // Attendees never trigger the staff "who am I" call.
     expect(fetchMock.mock.calls.some(([url]) => String(url).includes('/auth/me'))).toBe(false)
+  })
+
+  it('turns a reported problem into a complaint and shows its reference', async () => {
+    const { submitted } = mockServer()
+    renderPublic()
+
+    await userEvent.click(await screen.findByRole('button', { name: 'English' }))
+    await userEvent.click(await screen.findByRole('radio', { name: /General visit/ }))
+    await userEvent.click(screen.getByRole('button', { name: 'Next' }))
+    const overall = screen.getByRole('group', { name: /Overall experience/ })
+    await userEvent.click(within(overall).getByRole('radio', { name: /Poor/ }))
+    await userEvent.click(screen.getByRole('button', { name: 'Next' }))
+
+    await userEvent.click(screen.getByRole('switch', { name: /I want to report a problem/ }))
+    await userEvent.click(screen.getByRole('button', { name: 'Next' }))
+    expect(screen.getByText('Please choose what the problem was about')).toBeInTheDocument()
+    expect(screen.getByText('Please describe the problem in a few more words')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('radio', { name: 'Cleanliness or hygiene' }))
+    await userEvent.type(
+      screen.getByRole('textbox', { name: /What happened/ }),
+      'No water in the toilets near gate 2',
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Next' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Send feedback' }))
+
+    expect(await screen.findByText('MC-26-K7Q2XP')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Check the status now' })).toHaveAttribute(
+      'href',
+      '/track?ref=MC-26-K7Q2XP',
+    )
+    expect(submitted).toMatchObject([
+      {
+        complaint: {
+          categoryCode: 'CLEANLINESS',
+          description: 'No water in the toilets near gate 2',
+        },
+      },
+    ])
   })
 
   it('does not move on until the required rating is chosen', async () => {

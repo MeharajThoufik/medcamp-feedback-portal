@@ -19,7 +19,8 @@ Planning documents are in [`docs/`](docs/).
 | 2 | Camps: services, dates, feedback window, status, organizer-only editing | Done |
 | 3 | QR codes, printable bilingual poster with optional Wi-Fi QR, public camp link | Done |
 | 4 | Bilingual mobile feedback form, duplicate prevention, staff-assisted mode, Feedback tab | Done |
-| 5–9 | Complaints, dashboards | Planned |
+| 5 | Reporting a problem, complaint reference numbers, public /track page | Done |
+| 6–9 | Handling complaints, follow-up, dashboards | Planned |
 
 ## Requirements
 

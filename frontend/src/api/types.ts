@@ -121,6 +121,7 @@ export interface Settings {
   publicBaseUrl: string
   wifi: WifiNetwork | null
 }
+
 export interface RatingCategory {
   code: string
   labelEn: string
@@ -138,6 +139,14 @@ export interface PublicForm {
   feedbackState: FeedbackState
   services: { id: number; name: string; departmentName: string }[]
   categories: RatingCategory[]
+  complaintCategories: ComplaintCategory[]
+}
+
+/** What a reported problem is about. */
+export interface ComplaintCategory {
+  code: string
+  labelEn: string
+  labelHi: string
 }
 
 export type FormLanguage = 'en' | 'hi'
@@ -150,7 +159,8 @@ export interface FeedbackSubmission {
   /** Category code to a score from 1 to 5; skipped categories are left out. */
   ratings: Record<string, number>
   comment: string | null
-  problemReported: boolean
+  /** Set when the attendee reports a problem; it becomes a complaint with a reference number. */
+  complaint: { categoryCode: string; description: string } | null
   followUp: { consent: boolean; name: string; phone: string; email: string } | null
   /** Accepted only from signed-in staff filling the form in for an attendee. */
   assisted: boolean
@@ -166,12 +176,37 @@ export interface FeedbackItem {
   ratings: Record<string, number>
   comment: string | null
   problemReported: boolean
+  complaint: ComplaintBrief | null
   language: FormLanguage
   anonymous: boolean
   assisted: boolean
   assistedByName: string | null
   /** Only for the camp's managers, and only when the attendee agreed to be contacted. */
   contact: { name: string | null; phone: string | null; email: string | null } | null
+}
+
+export const COMPLAINT_STATUSES = ['OPEN', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'] as const
+export type ComplaintStatus = (typeof COMPLAINT_STATUSES)[number]
+export type ComplaintPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'
+
+/** A complaint as staff see it next to its feedback. */
+export interface ComplaintBrief {
+  referenceNo: string
+  status: ComplaintStatus
+  priority: ComplaintPriority
+  categoryCode: string
+  categoryLabelEn: string
+  categoryLabelHi: string
+  description: string
+}
+
+/** What the public status page shows: nothing that identifies anyone. */
+export interface PublicComplaintStatus {
+  referenceNo: string
+  status: ComplaintStatus
+  submittedAt: string
+  lastUpdatedAt: string
+  publicNote: string | null
 }
 
 export interface FeedbackSummary {

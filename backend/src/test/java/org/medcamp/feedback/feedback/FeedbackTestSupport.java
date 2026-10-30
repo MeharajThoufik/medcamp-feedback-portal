@@ -16,7 +16,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-abstract class FeedbackTestSupport extends CampTestSupport {
+/** Helpers for submitting feedback as an attendee; also used by the complaint tests. */
+public abstract class FeedbackTestSupport extends CampTestSupport {
 
 	/** Each test gets its own address, so the per-phone limit never carries over between tests. */
 	private static int ipCounter;
@@ -47,7 +48,7 @@ abstract class FeedbackTestSupport extends CampTestSupport {
 		body.put("serviceId", null);
 		body.put("ratings", Map.of("OVERALL", 4));
 		body.put("comment", null);
-		body.put("problemReported", false);
+		body.put("complaint", null);
 		body.put("followUp", null);
 		body.put("assisted", false);
 		return body;

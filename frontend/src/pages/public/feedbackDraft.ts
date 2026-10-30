@@ -13,6 +13,9 @@ export interface Answers {
   ratings: Record<string, number>
   comment: string
   problemReported: boolean
+  /** The problem type code, when a problem is reported. */
+  problemCategory: string | null
+  problemDescription: string
   wantsFollowUp: boolean
   contactName: string
   contactPhone: string
@@ -30,6 +33,8 @@ export const EMPTY_ANSWERS: Answers = {
   ratings: {},
   comment: '',
   problemReported: false,
+  problemCategory: null,
+  problemDescription: '',
   wantsFollowUp: false,
   contactName: '',
   contactPhone: '',
@@ -86,6 +91,9 @@ export function markSentFromThisPhone(token: string) {
 
 export type StepErrors = Partial<Record<string, string>>
 
+/** The server asks for at least this much, so staff can act on the problem. */
+export const PROBLEM_MIN_LENGTH = 10
+
 /** Checks one step; returns translation keys for the problems found. */
 export function validateStep(
   step: Step,
@@ -101,8 +109,15 @@ export function validateStep(
       if (!answers.ratings[code]) errors[code] = 'feedbackForm.ratings.required'
     }
   }
-  if (step === 'comment' && answers.comment.trim().length > 1000) {
-    errors.comment = 'validation.tooLong'
+  if (step === 'comment') {
+    if (answers.comment.trim().length > 1000) errors.comment = 'validation.tooLong'
+    if (answers.problemReported) {
+      if (!answers.problemCategory) errors.problemCategory = 'feedbackForm.problem.categoryRequired'
+      const length = answers.problemDescription.trim().length
+      if (length < PROBLEM_MIN_LENGTH)
+        errors.problemDescription = 'feedbackForm.problem.descriptionShort'
+      else if (length > 1000) errors.problemDescription = 'validation.tooLong'
+    }
   }
   if (step === 'followUp' && answers.wantsFollowUp) {
     const phone = answers.contactPhone.trim()

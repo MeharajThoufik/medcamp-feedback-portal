@@ -139,6 +139,8 @@ export function PosterSheet({ poster }: { poster: Poster }) {
       </ul>
       <p className="poster-footer">
         {en('help')} · {hi('help')}
+        <br />
+        {en('track')} / {hi('track')}: <strong>{new URL(poster.feedbackUrl).host}/track</strong>
       </p>
     </article>
   )
